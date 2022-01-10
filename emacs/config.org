@@ -1,0 +1,226 @@
+#+TITLE: Emacs config in org mode
+#+AUTHOR: Shriram Ashirgade
+#+STARTUP: content hidestars indent
+
+
+* Package management
+** Use [[https://melpa.org/#/][MELPA]] for package archive
+Adding melpa package repository and initializint
+#+begin_src emacs-lisp
+(require 'package)
+(add-to-list 'package-archives 
+	       '("melpa" . "https://melpa.org/packages/") t)
+;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
+;; and `package-pinned-packages`. Most users will not need or want to do this.
+;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(package-initialize)
+#+end_src
+Note that you'll need to run ~M-x package-refresh-contents~ or ~M-x package-list-packages~ to ensure that Emacs has fetched the MELPA package list before you can install packages with M-x package-install or similar.
+
+** Make sure that ~use-package~ is loaded
+This downloads ~use-package~ package if not installed.
+#+begin_src emacs-lisp
+(unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+#+end_src
+* Basic UX settings
+** No menu bar, tool bar, and scroll bar
+Removing tool bar on top. Let's be honest, who uses it. ...
+#+BEGIN_SRC emacs-lisp
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+#+END_SRC
+** CUA mode ( for copy paste )
+Usual C-c C-v for copy paste
+#+BEGIN_SRC emacs-lisp
+;;; Auto CUA mode
+(cua-mode t)
+(setq cua-auto-tabify-rectangles nil) ;; Don't tabify after rectangle commands
+(transient-mark-mode 1) ;; No region when it is not highlighted
+(setq cua-keep-region-after-copy t) ;; Standard Windows behaviour
+#+END_SRC
+** Auto line number
+To always have line numbers on the side
+
+#+BEGIN_SRC emacs-lisp
+;;; Auto line numbering
+;(add-hook 'prog-mode-hook 'display-line-numbers-mode) ;; Line number for only prog mode
+;(global-display-line-numbers-mode) ;; Line numver everywhere
+;;Line number excepr some model
+(require 'display-line-numbers)
+
+(defcustom display-line-numbers-exempt-modes
+  '(vterm-mode eshell-mode shell-mode term-mode ansi-term-mode treemacs-mode neotree-mode)
+  "Major modes on which to disable line numbers."
+  :group 'display-line-numbers
+  :type 'list
+  :version "green")
+
+(defun display-line-numbers--turn-on ()
+  "Turn on line numbers except for certain major modes.
+Exempt major modes are defined in `display-line-numbers-exempt-modes'."
+  (unless (or (minibufferp)
+              (member major-mode display-line-numbers-exempt-modes))
+    (display-line-numbers-mode)))
+
+(global-display-line-numbers-mode)
+
+#+END_SRC
+
+** Move custom files outside ~init.el~
+   Move all ~custom-*~ stuff into ~custom.config.el~. Do not put them in ~init.el~.
+
+#+begin_src emacs-lisp
+(setq custom-file "~/.emacs.d/custom.conf.el")
+(load-file custom-file)
+#+end_src
+** Text wrapping
+Turn on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Visual-Line-Mode.html][visual-line-moe]] for text and org files. This wraps words by word boundaries.
+
+#+begin_src emacs-lisp
+(add-hook 'text-mode-hook 'visual-line-mode)
+(add-hook 'org-mode 'visual-line-mode)
+#+end_src
+** Themes
++  VSCode dark theme
+ #+BEGIN_SRC emacs-lisp
+ (use-package vscode-dark-plus-theme
+   :ensure t
+   :config
+   (load-theme 'vscode-dark-plus t))
+ #+END_SRC
+
++  Zenburn theme
+ #+BEGIN_SRC emacs-lispX
+ (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+ (load-theme 'zenburn-theme t)
+ #+END_SRC
+** No background in terminal mode
+   Do not use theme background in terminal mode
+   So we can use classic terminal view
+   #+BEGIN_SRC emacs-lisp
+   ;; No background when in terminal mode (to use default terminal background )
+   (defun on-after-init ()
+     (unless (display-graphic-p (selected-frame))
+       (set-face-background 'default "unspecified-bg" (selected-frame))))
+
+   (add-hook 'window-setup-hook 'on-after-init)
+   #+END_SRC
+
+** Startup screen
+Startup do not include help page
+#+BEGIN_SRC emacs-lisp
+;; Disable the splash screen (to enable it agin, replace the t with 0)
+(setq inhibit-splash-screen 0)
+#+END_SRC
+
+** Doom modeline
+Description
+#+BEGIN_SRC emacs-lisp
+(use-package doom-modeline
+  :ensure t
+  :hook (after-init . doom-modeline-mode))
+#+END_SRC
+** Neo tree side buffer
+Using neotree to show current dir (Don't know how to use dired)
+First config command adds neotree to startup hook so that it loads on startup
+Second config command adds multiline mode to neotree so that long file names are shown by textwrap
+#+BEGIN_SRC emacs-lisp
+(use-package neotree
+   :ensure t
+   :config
+   (add-hook 'emacs-startup-hook 'neotree)
+   (add-hook 'neotree-mode-hook 'visual-line-mode))
+#+END_SRC
+** Fancy icons in GUI
+Display fancy icons when in gui 
+#+BEGIN_SRC emacs-lisp
+(when (display-graphic-p)
+  (require 'all-the-icons))
+#+END_SRC
+** Transient mark mode
+Don't know what it is
+#+BEGIN_SRC emacs-lisp
+(transient-mark-mode 1)
+#+END_SRC
+** Which key
+#+BEGIN_SRC emacs-lisp
+(use-package which-key
+   :ensure t
+   :init 
+   (which-key-mode))
+#+END_SRC
+** Yes or no ==>  y or n
+Instead of typing full *yes* or *no*, we just write *y* or *n*. Save some time for your girl.
+#+BEGIN_SRC emacs-lisp
+  (defalias 'yes-or-no-p 'y-or-no-p)
+#+END_SRC
+** No saving backups. We don't need them :D
+#+BEGIN_SRC emacs-lisp
+  (setq make-backup-file nil)
+  (setq auto-save-default nil)
+#+END_SRC
+* Org mode
+** Org bable
++ Org bable load languages
+ #+BEGIN_SRC emacs-lisp
+ (org-babel-do-load-languages
+  'org-babel-load-languages
+  '(
+    (python . t)
+    (shell . t)
+    ))
+ #+END_SRC
+
++  Org bable no confirmation for following languages
+ #+BEGIN_SRC emacs-lisp
+ (defun my-org-confirm-babel-evaluate (lang body)
+   (not (member lang '("python" ))))
+ (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+ #+END_SRC
+
++  Language specific commands
+  -  Python command
+     #+BEGIN_SRC emacs-lisp
+     (setq org-babel-python-command "python3")
+      #+END_SRC
+** Org todo->done log time stamp
+Log a timestamp when a TODO is changed to DONE state
+#+BEGIN_SRC emacs-lisp
+(setq org-log-done 'time)
+#+END_SRC
+
+** Org Bullets
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :config
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
+#+END_SRC
+** Leading stars and indentation
+#+BEGIN_SRC emacs-lisp
+  (setq org-startup-indented t
+        org-hide-leading-stars t)
+#+END_SRC
+** Hide emphasis markers
+Hide the ~code~, /italics/ and *bold* _u+nderline_ =verbatim= +strike-through+
+#+BEGIN_SRC emacs-lisp
+  (setq org-hide-emphasis-markers t)
+#+END_SRC 
+** TODO Custom faces for different headline level
+ These are having some issues with toto font size being too small so check it out
+#+BEGIN_SRC emacs-lisp
+ ; (custom-theme-set-faces
+  ;     'user
+   ;    `(org-level-4 ((t ( :height 1.1   ))))
+    ;   `(org-level-3 ((t ( :height 1  ))))
+     ;  `(org-level-2 ((t ( :height 1.1   ))))
+      ; `(org-level-1 ((t ( :height 1.25  ))))
+      ; `(org-document-title ((t ( :height 1.5 :underline nil)))))
+#+END_SRC
+** Variable pitch mode ? Ye kya hai re bava?
+#+BEGIN_SRC emacs-lisp
+  ;(add-hook 'org-mode-hook 'variable-pitch-mode)
+#+END_SRC
