@@ -25,6 +25,11 @@ This downloads ~use-package~ package if not installed.
     (package-install 'use-package))
 #+end_src
 * Basic UX settings
+** Open maximised
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+  (add-to-list 'default-frame-alist '(fullscreen . fullheight))
+#+END_SRC
 ** No menu bar, tool bar, and scroll bar
 Removing tool bar on top. Let's be honest, who uses it. ...
 #+BEGIN_SRC emacs-lisp
