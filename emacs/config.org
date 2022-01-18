@@ -75,6 +75,11 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
 (line-number-mode 1)
 (column-number-mode 1)
 #+END_SRC
+
+Showing relative line numbers
+#+BEGIN_SRC emacs-lisp
+(setq display-line-numbers-type 'relative)
+#+END_SRC
 ** Move custom files outside ~init.el~
    Move all ~custom-*~ stuff into ~custom.config.el~. Do not put them in ~init.el~.
 
@@ -272,6 +277,11 @@ Hide the ~code~, /italics/ and *bold* _u+nderline_ =verbatim= +strike-through+
 #+BEGIN_SRC emacs-lisp
   (setq org-hide-emphasis-markers t)
 #+END_SRC 
+** Pretty symbols
+Show pretty symbols like \lambda instead of \ lambda
+#+BEGIN_SRC emacs-lisp
+  (setq org-pretty-entities t)
+#+END_SRC
 ** TODO Custom faces for different headline level
 These are having some issues with toto font size being too small so check it out
 #+BEGIN_SRC emacs-lisp
