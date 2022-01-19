@@ -7,21 +7,23 @@
 ** Use [[https://melpa.org/#/][MELPA]] for package archive
 Adding melpa package repository and initializint
 #+begin_src emacs-lisp
-(require 'package)
-(add-to-list 'package-archives 
-	       '("melpa" . "https://melpa.org/packages/") t)
-;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
-;; and `package-pinned-packages`. Most users will not need or want to do this.
-;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
-(package-initialize)
+  (require 'package)
+  (add-to-list 'package-archives 
+                 '("melpa" . "https://melpa.org/packages/") t)
+  ;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
+  ;; and `package-pinned-packages`. Most users will not need or want to do this.
+  ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+  (package-initialize)
 #+end_src
-Note that you'll need to run ~M-x package-refresh-contents~ or ~M-x package-list-packages~ to ensure that Emacs has fetched the MELPA package list before you can install packages with M-x package-install or similar.
-
+Note that you'll need to run ~M-x package-refresh-contents~ or ~M-x package-list-packages~ to ensure that Emacs has fetched the MELPA package list before you can install packages with M-x package-install or similar. Following does that automatically
+#+BEGIN_SRC emacs-lisp
+  (unless package-archive-contents
+    (package-refresh-contents))
+#+END_SRC
 ** Make sure that ~use-package~ is loaded
 This downloads ~use-package~ package if not installed.
 #+begin_src emacs-lisp
 (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
     (package-install 'use-package))
 #+end_src
 * Basic UX settings
@@ -29,6 +31,11 @@ This downloads ~use-package~ package if not installed.
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
   (add-to-list 'default-frame-alist '(fullscreen . fullheight))
+#+END_SRC
+** Escape to quit prompt
+Press ~ESC~ to quit the prompt
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+END_SRC
 ** No menu bar, tool bar, and scroll bar
 Removing tool bar on top. Let's be honest, who uses it. ...
@@ -50,34 +57,19 @@ Usual C-c C-v for copy paste
 To always have line numbers on the side
 
 #+BEGIN_SRC emacs-lisp
-;;; Auto line numbering
-;(add-hook 'prog-mode-hook 'display-line-numbers-mode) ;; Line number for only prog mode
-;(global-display-line-numbers-mode) ;; Line numver everywhere
-;;Line number excepr some model
-(require 'display-line-numbers)
+  (column-number-mode 1)
+  (line-number-mode 1)
+  (global-display-line-numbers-mode t)
 
-(defcustom display-line-numbers-exempt-modes
-  '(vterm-mode eshell-mode shell-mode term-mode ansi-term-mode treemacs-mode neotree-mode)
-  "Major modes on which to disable line numbers."
-  :group 'display-line-numbers
-  :type 'list
-  :version "green")
-
-(defun display-line-numbers--turn-on ()
-  "Turn on line numbers except for certain major modes.
-Exempt major modes are defined in `display-line-numbers-exempt-modes'."
-  (unless (or (minibufferp)
-              (member major-mode display-line-numbers-exempt-modes))
-    (display-line-numbers-mode)))
-
-(global-display-line-numbers-mode)
-
-(line-number-mode 1)
-(column-number-mode 1)
+  ;; Disable line numbers for some modes
+  (dolist (mode '(term-mode-hook
+                  eshell-mode-hook
+                  neotree-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+END_SRC
 
 Showing relative line numbers
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lispX
 (setq display-line-numbers-type 'relative)
 #+END_SRC
 ** Move custom files outside ~init.el~
@@ -157,10 +149,10 @@ Don't know what it is
 #+END_SRC
 ** Which key
 #+BEGIN_SRC emacs-lisp
-(use-package which-key
-   :ensure t
-   :init 
-   (which-key-mode))
+  (use-package which-key
+     :ensure t
+     :init (which-key-mode)
+     :config (setq which-key-idle-delay 0.7))
 #+END_SRC
 ** Yes or no ==>  y or n
 Instead of typing full *yes* or *no*, we just write *y* or *n*. Save some time for your girl.
@@ -213,9 +205,8 @@ Only for prog mode?
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
     :ensure t
-    :init
-    ;(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
-    (rainbow-delimiters-mode 1))
+    :hook ((prog-mode . rainbow-delimiters-mode)
+           (org-mode . rainbow-delimiters-mode)))
 #+END_SRC
 ** Fancy killring
 #+BEGIN_SRC emacs-lisp
@@ -349,6 +340,8 @@ For easy ~M-x~
     :bind
     ("M-x" . smex))
 #+END_SRC
+*** TODO Counsel as an alternative?
+Uses ivy ivr rich seems better than smes
 ** Ace jump mode
 To jump around buffer/windows
 #+BEGIN_SRC emacs-lisp
@@ -389,9 +382,6 @@ For generative work
     :ensure t
     :init (add-hook prog-mode-hook 'rainbow-mode))
 #+END_SRC
-** TODO Autocomplete?
-Company? Autocomplete?
-** TODO Yasnippets
 * Custom functoins
 ** Kill word improvement
 #+BEGIN_SRC emacs-lisp
@@ -401,7 +391,16 @@ Company? Autocomplete?
     (kill-word 1))
   (global-set-key (kbd "M-d") 'kill-whole-word)	     
 #+END_SRC
-* TODO Startup dashboard 
+* To do someday [0/9]
+** TODO Autocomplete? Company? 
+** TODO Yasnippets
+** TODO helpful
+** TODO Ivy Swyper(done) and Counsel for minibuffer
+** TODO Startup dashboard something    
+** TODO Magit
+** TODO Git changes in side gutter/fringes
+** TODO [[https://github.com/DarthFennec/highlight-indent-guides][Indentation highlight]]
+** TODO 
 * Apply changes
 Copy the file to the required location
 Go to the code below and press ~C-c~ and then confirm yes
