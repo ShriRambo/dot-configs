@@ -23,80 +23,21 @@ Note that you'll need to run ~M-x package-refresh-contents~ or ~M-x package-list
 ** Make sure that ~use-package~ is loaded
 This downloads ~use-package~ package if not installed.
 #+begin_src emacs-lisp
-(unless (package-installed-p 'use-package)
+  (unless (package-installed-p 'use-package)
     (package-install 'use-package))
+  (require 'use-package)
+  (setq use-package-always-ensure t)
 #+end_src
-* Basic UX settings
-** Open maximised
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-  (add-to-list 'default-frame-alist '(fullscreen . fullheight))
-#+END_SRC
-** Escape to quit prompt
-Press ~ESC~ to quit the prompt
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-#+END_SRC
-** No menu bar, tool bar, and scroll bar
-Removing tool bar on top. Let's be honest, who uses it. ...
-#+BEGIN_SRC emacs-lisp
-(tool-bar-mode -1)
-(menu-bar-mode -1)
-(scroll-bar-mode -1)
-#+END_SRC
-** CUA mode ( for copy paste )
-Usual C-c C-v for copy paste
-#+BEGIN_SRC emacs-lisp
-;;; Auto CUA mode
-(cua-mode t)
-(setq cua-auto-tabify-rectangles nil) ;; Don't tabify after rectangle commands
-(transient-mark-mode 1) ;; No region when it is not highlighted
-(setq cua-keep-region-after-copy t) ;; Standard Windows behaviour
-#+END_SRC
-** Auto line number
-To always have line numbers on the side
-
-#+BEGIN_SRC emacs-lisp
-  (column-number-mode 1)
-  (line-number-mode 1)
-  (global-display-line-numbers-mode t)
-
-  ;; Disable line numbers for some modes
-  (dolist (mode '(term-mode-hook
-                  eshell-mode-hook
-                  neotree-mode-hook))
-    (add-hook mode (lambda () (display-line-numbers-mode 0))))
-#+END_SRC
-
-Showing relative line numbers
-#+BEGIN_SRC emacs-lispX
-(setq display-line-numbers-type 'relative)
-#+END_SRC
-** Move custom files outside ~init.el~
-   Move all ~custom-*~ stuff into ~custom.config.el~. Do not put them in ~init.el~.
-
-#+begin_src emacs-lisp
-(setq custom-file "~/.emacs.d/custom.conf.el")
-(load-file custom-file)
-#+end_src
-** Text wrapping
-Turn on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Visual-Line-Mode.html][visual-line-moe]] for text and org files. This wraps words by word boundaries.
-
-#+begin_src emacs-lisp
-(add-hook 'text-mode-hook 'visual-line-mode)
-(add-hook 'org-mode 'visual-line-mode)
-#+end_src
-** Themes
-+  VSCode dark theme
+* Theme
+** VSCode dark theme
  #+BEGIN_SRC emacs-lisp
  (use-package vscode-dark-plus-theme
    :ensure t
    :config
    (load-theme 'vscode-dark-plus t))
  #+END_SRC
-
-+  Zenburn theme
- #+BEGIN_SRC emacs-lispX
+** Zenburn theme
+ #+BEGIN_SRC emacs-lisp :tangle no
  (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
  (load-theme 'zenburn-theme t)
  #+END_SRC
@@ -111,19 +52,20 @@ Turn on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Visual-Line-
 
    (add-hook 'window-setup-hook 'on-after-init)
    #+END_SRC
-
-** Startup screen
-Startup do not include help page
-#+BEGIN_SRC emacs-lisp
-;; Disable the splash screen (to enable it agin, replace the t with 0)
-(setq inhibit-splash-screen 0)
-#+END_SRC
+* Mode line
 ** Doom modeline
 Description
 #+BEGIN_SRC emacs-lisp
 (use-package doom-modeline
   :ensure t
   :hook (after-init . doom-modeline-mode))
+#+END_SRC
+* Basic UX settings
+** Startup screen
+Startup do not include help page
+#+BEGIN_SRC emacs-lisp
+;; Disable the splash screen (to enable it agin, replace the t with 0)
+(setq inhibit-splash-screen 0)
 #+END_SRC
 ** Neo tree side buffer
 Using neotree to show current dir (Don't know how to use dired)
@@ -177,7 +119,7 @@ Instead of typing full *yes* or *no*, we just write *y* or *n*. Save some time f
 #+END_SRC
 ** TODO Electric pairs
 Not working porperly
-#+BEGIN_SRC emacs-lispX
+#+BEGIN_SRC emacs-lisp :tangle no
   (setq electric-pair-pairs '(
                               (?\ . ?\))
                               (?\[ . ?\])
@@ -192,10 +134,9 @@ To remove all lagging spaces all at once
     :ensure t
     :config (global-hungry-delete-mode))
 #+END_SRC
-*** TODO Maybe delet leading spaces as well???????
 ** Sudo edit
 Do I really need it?
-#+BEGIN_SRC emacs-lispX
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package sudo-edit
     :ensure t
     :bind ("s-e" . sudo-edit))
@@ -221,6 +162,65 @@ Only for prog mode?
       :ensure t
       :config (global-pretty-mode 1)))
 #+END_SRC 
+** Open maximised
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+  (add-to-list 'default-frame-alist '(fullscreen . fullheight))
+#+END_SRC
+** Escape to quit prompt
+Press ~ESC~ to quit the prompt
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+#+END_SRC
+** No menu bar, tool bar, and scroll bar
+Removing tool bar on top. Let's be honest, who uses it. ...
+#+BEGIN_SRC emacs-lisp
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+#+END_SRC
+** CUA mode ( for copy paste )
+Usual C-c C-v for copy paste
+#+BEGIN_SRC emacs-lisp
+;;; Auto CUA mode
+(cua-mode t)
+(setq cua-auto-tabify-rectangles nil) ;; Don't tabify after rectangle commands
+(transient-mark-mode 1) ;; No region when it is not highlighted
+(setq cua-keep-region-after-copy t) ;; Standard Windows behaviour
+#+END_SRC
+** Auto line number
+To always have line numbers on the side
+
+#+BEGIN_SRC emacs-lisp
+  (column-number-mode 1)
+  (line-number-mode 1)
+  (global-display-line-numbers-mode t)
+
+  ;; Disable line numbers for some modes
+  (dolist (mode '(term-mode-hook
+                  eshell-mode-hook
+                  neotree-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+#+END_SRC
+
+Showing relative line numbers
+#+BEGIN_SRC emacs-lisp :tangle no
+(setq display-line-numbers-type 'relative)
+#+END_SRC
+** Move custom files outside ~init.el~
+   Move all ~custom-*~ stuff into ~custom.config.el~. Do not put them in ~init.el~.
+
+#+begin_src emacs-lisp
+(setq custom-file "~/.emacs.d/custom.conf.el")
+(load-file custom-file)
+#+end_src
+** Text wrapping
+Turn on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Visual-Line-Mode.html][visual-line-moe]] for text and org files. This wraps words by word boundaries.
+
+#+begin_src emacs-lisp
+(add-hook 'text-mode-hook 'visual-line-mode)
+(add-hook 'org-mode 'visual-line-mode)
+#+end_src
 * Org mode
 ** Org bable
 + Org bable load languages
@@ -275,14 +275,14 @@ Show pretty symbols like \lambda instead of \ lambda
 #+END_SRC
 ** TODO Custom faces for different headline level
 These are having some issues with toto font size being too small so check it out
-#+BEGIN_SRC emacs-lisp
- ; (custom-theme-set-faces
-  ;     'user
-   ;    `(org-level-4 ((t ( :height 1.1   ))))
-    ;   `(org-level-3 ((t ( :height 1  ))))
-     ;  `(org-level-2 ((t ( :height 1.1   ))))
-      ; `(org-level-1 ((t ( :height 1.25  ))))
-      ; `(org-document-title ((t ( :height 1.5 :underline nil)))))
+#+BEGIN_SRC emacs-lisp :tangle no
+  (custom-theme-set-faces
+       'user
+      `(org-level-4 ((t ( :height 1.1   ))))
+     `(org-level-3 ((t ( :height 1  ))))
+    `(org-level-2 ((t ( :height 1.1   ))))
+   `(org-level-1 ((t ( :height 1.25  ))))
+   `(org-document-title ((t ( :height 1.5 :underline nil)))))
 #+END_SRC
 ** Variable pitch mode ? Ye kya hai re bava?
 #+BEGIN_SRC emacs-lisp
@@ -302,11 +302,11 @@ These are having some issues with toto font size being too small so check it out
 ** Gen config
 *** Src edit window no split
 Do not split while editing ~src~ with ~C-c '~
-#+BEGIN_SRC emacs-lispX
+#+BEGIN_SRC emacs-lisp :tangle no
   (setq org-src-window-setup 'current-window)
 #+END_SRC
 * Moving around
-** Ido 
+** Ido
 I do this and I do that
 #+BEGIN_SRC emacs-lisp
   (setq ido-enable-flex-matching nil)
@@ -315,7 +315,7 @@ I do this and I do that
   (ido-mode 1)
 #+END_SRC
 For simply switching buffer
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (global-set-key (kbd "C-x b") 'ido-switch-buffer)
 #+END_SRC
 *** Verticle Ido
@@ -326,14 +326,14 @@ Seems nice. But this depends on Ido, so keep the Ido section
     :init
     (ido-vertical-mode 1))
 #+END_SRC
-** Ibuffer 
+** Ibuffer  
 To enter Ibuffer (gives a bit detailed view) 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp 
   (global-set-key (kbd "C-x C-b") 'ibuffer)
 #+END_SRC
 ** Smex
 For easy ~M-x~
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package smex
     :ensure t
     :init (smex-initialize)
@@ -374,10 +374,15 @@ This change willnot just split window but also follow to the new window.
     :ensure t
     :bind ("C-s" . swiper))
 #+END_SRC
+** Counsel for minibuffer help (comes with ivy)
+#+BEGIN_SRC emacs-lisp :tangle no
+  (use-package counsel
+    :bind (("M-x" . counsel-M-x))
+#+END_SRC
 * Others
 ** Rainbow
 For generative work
-#+BEGIN_SRC emacs-lispX
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package rainbow-mode
     :ensure t
     :init (add-hook prog-mode-hook 'rainbow-mode))
@@ -395,7 +400,38 @@ For generative work
 ** TODO Autocomplete? Company? 
 ** TODO Yasnippets
 ** TODO helpful
+#+BEGIN_SRC emacs-lisp :tangle no
+  (use-package helpful)
+#+END_SRC
 ** TODO Ivy Swyper(done) and Counsel for minibuffer
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy
+    :diminish
+    :bind (("C-x b" . ivy-switch-buffer)
+           :map ivy-minibuffer-map
+           ("TAB" . ivy-alt-done)	
+           ("C-l" . ivy-alt-done)
+           ("C-j" . ivy-next-line)
+           ("C-k" . ivy-previous-line)
+           :map ivy-switch-buffer-map
+           ("C-k" . ivy-previous-line)
+           ("C-l" . ivy-done)
+           ("C-d" . ivy-switch-buffer-kill)
+           :map ivy-reverse-i-search-map
+           ("C-k" . ivy-previous-line)
+           ("C-d" . ivy-reverse-i-search-kill))
+
+    :config
+    (ivy-mode 1))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel
+      :ensure t
+      :bind ("M-x" . counsel-M-x))
+
+  ;    :config ((setq counsel-describe-function-function #'helpful-callable)
+   ;;            (setq counsel-describe-variable-function #'helpful-variable)))
+#+END_SRC
 ** TODO Startup dashboard something    
 ** TODO Magit
 ** TODO Git changes in side gutter/fringes
@@ -409,3 +445,4 @@ Go to the code below and press ~C-c~ and then confirm yes
 #+END_SRC
 
 And reload the emacs config
+
