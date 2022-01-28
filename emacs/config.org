@@ -1,6 +1,6 @@
 #+TITLE: Emacs config in org mode
 #+AUTHOR: Shriram Ashirgade
-#+STARTUP: content hidestars indent
+#+STARTUP: content show2levels hidestars indent
 
 
 * Package management
@@ -258,6 +258,12 @@ Log a timestamp when a TODO is changed to DONE state
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
 #+END_SRC
+** Elipsis
+The end of the heading character that will show that the heading is folded
+#+BEGIN_SRC emacs-lisp
+  (setq org-ellipsis " ⤵")
+#+END_SRC
+Other interesting characters are ▼, ↴, ⬎, ⤷, and ⋱ 
 ** Leading stars and indentation
 #+BEGIN_SRC emacs-lisp
   (setq org-startup-indented t
@@ -308,7 +314,8 @@ Do not split while editing ~src~ with ~C-c '~
 * Moving around
 ** Ido
 I do this and I do that
-#+BEGIN_SRC emacs-lisp
+~C-x C-f~ for using IDO to find file
+#+BEGIN_SRC emacs-lisp :tangle no
   (setq ido-enable-flex-matching nil)
   (setq ido-create-new-buffer 'always)
   (setq ido-everywhere t)
@@ -326,7 +333,7 @@ Seems nice. But this depends on Ido, so keep the Ido section
     :init
     (ido-vertical-mode 1))
 #+END_SRC
-** Ibuffer  
+** Ibuffer
 To enter Ibuffer (gives a bit detailed view) 
 #+BEGIN_SRC emacs-lisp 
   (global-set-key (kbd "C-x C-b") 'ibuffer)
@@ -340,8 +347,6 @@ For easy ~M-x~
     :bind
     ("M-x" . smex))
 #+END_SRC
-*** TODO Counsel as an alternative?
-Uses ivy ivr rich seems better than smes
 ** Ace jump mode
 To jump around buffer/windows
 #+BEGIN_SRC emacs-lisp
@@ -374,10 +379,62 @@ This change willnot just split window but also follow to the new window.
     :ensure t
     :bind ("C-s" . swiper))
 #+END_SRC
+** Ivy
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy
+      :diminish
+      :bind (("C-x b" . ivy-switch-buffer)
+             :map ivy-minibuffer-map
+             ("TAB" . ivy-alt-done)	
+             ("C-l" . ivy-alt-done)
+             ("C-j" . ivy-next-line)
+             ("C-k" . ivy-previous-line)
+             :map ivy-switch-buffer-map
+             ("C-k" . ivy-previous-line)
+             ("C-l" . ivy-done)
+             ("C-d" . ivy-switch-buffer-kill)
+             :map ivy-reverse-i-search-map
+             ("C-k" . ivy-previous-line)
+             ("C-d" . ivy-reverse-i-search-kill))
+
+      :config
+      (ivy-mode 1))
+#+END_SRC
 ** Counsel for minibuffer help (comes with ivy)
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp 
   (use-package counsel
-    :bind (("M-x" . counsel-M-x))
+      :ensure t
+      :bind (("M-x" . counsel-M-x)
+             ("C-x f" . counsel-find-file)
+             :map minibuffer-local-map
+             ("C-r" . 'counsel-minibuffer-history))
+      :config (setq ivy-initial-inputs-alist nil)
+      )
+#+END_SRC
+*** TODO Remove initial ~^~ symbol when in ~M-x~ input 
+*** TODO Helpful integration
+** Ivy rich
+Some helpful transformations for ~Ivy~ and ~Counsel~
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy-rich
+    :init
+    (ivy-rich-mode 1)
+    :config
+    (setq ivy-format-function #'ivy-format-function-line))
+#+END_SRC
+*** TODO Better formatting for ~switch buffer~ viwe.
+** Helpful
+#+BEGIN_SRC emacs-lisp
+  (use-package helpful
+     :custom
+     (counsel-describe-function-function #'helpful-callable)
+     (counsel-describe-variable-function #'helpful-variable)
+     :bind 
+     ([remap describe-function] .  counsel-describe-function)
+     ([remap describe-symbol]  . helpful-symbol)
+     ([remap describe-variable] . counsel-describe-variable)
+     ([remap describe-command] .  helpful-command)
+     ([remap describe-key] .  helpful-key))
 #+END_SRC
 * Others
 ** Rainbow
@@ -399,12 +456,8 @@ For generative work
 * To do someday [0/9]
 ** TODO Autocomplete? Company? 
 ** TODO Yasnippets
-** TODO helpful
-#+BEGIN_SRC emacs-lisp :tangle no
-  (use-package helpful)
-#+END_SRC
 ** TODO Ivy Swyper(done) and Counsel for minibuffer
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package ivy
     :diminish
     :bind (("C-x b" . ivy-switch-buffer)
@@ -424,19 +477,20 @@ For generative work
     :config
     (ivy-mode 1))
 #+END_SRC
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package counsel
       :ensure t
       :bind ("M-x" . counsel-M-x))
 
-  ;    :config ((setq counsel-describe-function-function #'helpful-callable)
-   ;;            (setq counsel-describe-variable-function #'helpful-variable)))
+      :config ((setq counsel-describe-function-function #'helpful-callable)
+              (setq counsel-describe-variable-function #'helpful-variable)))
 #+END_SRC
 ** TODO Startup dashboard something    
 ** TODO Magit
 ** TODO Git changes in side gutter/fringes
 ** TODO [[https://github.com/DarthFennec/highlight-indent-guides][Indentation highlight]]
-** TODO 
+** TODO
+* TODO  Using noweb to better organize config
 * Apply changes
 Copy the file to the required location
 Go to the code below and press ~C-c~ and then confirm yes
