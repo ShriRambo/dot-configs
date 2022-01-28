@@ -487,6 +487,9 @@ For generative work
 #+END_SRC
 ** TODO Startup dashboard something    
 ** TODO Magit
+#+BEGIN_SRC emacs-lisp
+  (use-package magit)
+#+END_SRC
 ** TODO Git changes in side gutter/fringes
 ** TODO [[https://github.com/DarthFennec/highlight-indent-guides][Indentation highlight]]
 ** TODO
