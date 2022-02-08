@@ -1,7 +1,7 @@
 #+TITLE: Emacs config in org mode
 #+AUTHOR: Shriram Ashirgade
-#+STARTUP: content show2levels hidestars indent
-
+#+STARTUP: content  hidestars indent
+#+date: 2022:01:01
 
 * Package management
 ** Use [[https://melpa.org/#/][MELPA]] for package archive
@@ -113,7 +113,7 @@ Instead of typing full *yes* or *no*, we just write *y* or *n*. Save some time f
     :init
     (beacon-mode 1))
 #+END_SRC
-** TODO Camel Case (Make it only for prog mode)
+** Camel Case (Make it only for prog mode)
 #+BEGIN_SRC emacs-lisp
   (global-subword-mode 1)
 #+END_SRC
@@ -251,12 +251,20 @@ Log a timestamp when a TODO is changed to DONE state
 (setq org-log-done 'time)
 #+END_SRC
 
+And log it to a drawer
+#+BEGIN_SRC emacs-lisp
+  (setq org-log-into-drawer t)
+#+END_SRC
+
 ** Org Bullets
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
-    :ensure t
-    :config
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
+    :after org
+    :hook (org-mode . org-bullets-mode))
+
+  ; :custom (org-bullet-list '("" "" "" "" ))
+  ;  :config
+  ;  (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
 #+END_SRC
 ** Elipsis
 The end of the heading character that will show that the heading is folded
@@ -290,12 +298,24 @@ These are having some issues with toto font size being too small so check it out
    `(org-level-1 ((t ( :height 1.25  ))))
    `(org-document-title ((t ( :height 1.5 :underline nil)))))
 #+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (face '((org-level-1 . 1.3)
+                  (org-level-2 . 1.1)
+                  (org-level-3 . 1.05)
+                  (org-level-4 . 1.0)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.1)
+                  (org-level-7 . 1.1)
+                  (org-level-8 . 1.1)))
+      (set-face-attribute (car face) nil :weight 'regular :height (cdr face)))
+
+#+END_SRC
 ** Variable pitch mode ? Ye kya hai re bava?
 #+BEGIN_SRC emacs-lisp
   ;(add-hook 'org-mode-hook 'variable-pitch-mode)
 #+END_SRC
 ** Snippets
-*** TODO Source blocks of different languages  (Refactor to have single add-to-list)
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'org-structure-template-alist
                '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
@@ -304,6 +324,8 @@ These are having some issues with toto font size being too small so check it out
   (add-to-list 'org-structure-template-alist
                '("sh" "#+BEGIN_SRC shell\n?\n#+END_SRC"))
 #+END_SRC
+
+Org tempo can also be used. 
 
 ** Gen config
 *** Src edit window no split
@@ -408,11 +430,9 @@ This change willnot just split window but also follow to the new window.
              ("C-x f" . counsel-find-file)
              :map minibuffer-local-map
              ("C-r" . 'counsel-minibuffer-history))
-      :config (setq ivy-initial-inputs-alist nil)
+      :config (setq ivy-initial-inputs-alist nil) ;Removes initial ^
       )
 #+END_SRC
-*** TODO Remove initial ~^~ symbol when in ~M-x~ input 
-*** TODO Helpful integration
 ** Ivy rich
 Some helpful transformations for ~Ivy~ and ~Counsel~
 #+BEGIN_SRC emacs-lisp
@@ -422,7 +442,6 @@ Some helpful transformations for ~Ivy~ and ~Counsel~
     :config
     (setq ivy-format-function #'ivy-format-function-line))
 #+END_SRC
-*** TODO Better formatting for ~switch buffer~ viwe.
 ** Helpful
 #+BEGIN_SRC emacs-lisp
   (use-package helpful
@@ -436,15 +455,31 @@ Some helpful transformations for ~Ivy~ and ~Counsel~
      ([remap describe-command] .  helpful-command)
      ([remap describe-key] .  helpful-key))
 #+END_SRC
+
 * Others
 ** Rainbow
-For generative work
+For generative work (shows colors with that color background)
 #+BEGIN_SRC emacs-lisp :tangle no
   (use-package rainbow-mode
     :ensure t
     :init (add-hook prog-mode-hook 'rainbow-mode))
 #+END_SRC
-* Custom functoins
+** Yasnippet
+For inserting standard snippets and making
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :config
+    (use-package yasnippet-snippets
+      :ensure t)
+    (yas-reload-all)
+    :hook (prog-mode . yas-minor-mode))
+#+END_SRC
+** Magit
+#+BEGIN_SRC emacs-lisp
+  (use-package magit)
+#+END_SRC
+* Custom functions
 ** Kill word improvement
 #+BEGIN_SRC emacs-lisp
   (defun kill-whole-word ()
@@ -455,8 +490,15 @@ For generative work
 #+END_SRC
 * To do someday [0/9]
 ** TODO Autocomplete? Company? 
-** TODO Yasnippets
-** TODO Ivy Swyper(done) and Counsel for minibuffer
+** TODO Startup dashboard something    
+** TODO Git changes in side gutter/fringes
+** TODO [[https://github.com/DarthFennec/highlight-indent-guides][Indentation highlight]]
+** TODO Tab bar mode
+[[https://www.youtube.com/watch?v=C7ZlNRbWdVI][System Crafters video]]
+* TODO  Using noweb to better organize config
+* Archives
+The configuration wihich is not in use anymore
+**  Ivy switch buffer improvement
 #+BEGIN_SRC emacs-lisp :tangle no
   (use-package ivy
     :diminish
@@ -477,6 +519,7 @@ For generative work
     :config
     (ivy-mode 1))
 #+END_SRC
+** Counsel with helpful
 #+BEGIN_SRC emacs-lisp :tangle no
   (use-package counsel
       :ensure t
@@ -485,15 +528,6 @@ For generative work
       :config ((setq counsel-describe-function-function #'helpful-callable)
               (setq counsel-describe-variable-function #'helpful-variable)))
 #+END_SRC
-** TODO Startup dashboard something    
-** TODO Magit
-#+BEGIN_SRC emacs-lisp
-  (use-package magit)
-#+END_SRC
-** TODO Git changes in side gutter/fringes
-** TODO [[https://github.com/DarthFennec/highlight-indent-guides][Indentation highlight]]
-** TODO
-* TODO  Using noweb to better organize config
 * Apply changes
 Copy the file to the required location
 Go to the code below and press ~C-c~ and then confirm yes
@@ -502,4 +536,3 @@ Go to the code below and press ~C-c~ and then confirm yes
 #+END_SRC
 
 And reload the emacs config
-
