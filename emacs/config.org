@@ -103,7 +103,7 @@ Instead of typing full *yes* or *no*, we just write *y* or *n*. Save some time f
 #+END_SRC
 ** No saving backups. We don't need them :D
 #+BEGIN_SRC emacs-lisp
-  (setq make-backup-file nil)
+  (setq make-backup-files nil)
   (setq auto-save-default nil)
 #+END_SRC
 ** Beacon mode 

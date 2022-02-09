@@ -1,0 +1,13 @@
+#+TITLE: Dotfile Repository
+#+AUTHOR: Shriram Ashirgade
+#+STARTUP: content  hidestars indent
+#+date: 2022:02:08
+
+
+This repository contains literate configuratoin files for the applications I use.
+
+* Links
++ [[./emacs/config.org][Emacs config]]
++ [[./rofi/config.org][Rofi]]
++ [[./bash/config.org][Bash]]
++ [[./konsole/config.org][Konsole]]
