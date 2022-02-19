@@ -30,12 +30,32 @@ This downloads ~use-package~ package if not installed.
 #+end_src
 * Theme
 ** VSCode dark theme
- #+BEGIN_SRC emacs-lisp
+ #+BEGIN_SRC emacs-lisp :tangle no
  (use-package vscode-dark-plus-theme
    :ensure t
    :config
    (load-theme 'vscode-dark-plus t))
  #+END_SRC
+** Doom theme
+#+BEGIN_SRC emacs-lisp
+  (use-package doom-themes
+    :ensure t
+    :config
+    ;; Global settings (defaults)
+    (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+          doom-themes-enable-italic t) ; if nil, italics is universally disabled
+    (load-theme 'doom-gruvbox t)
+
+    ;; Enable flashing mode-line on errors
+    (doom-themes-visual-bell-config)
+    ;; Enable custom neotree theme (all-the-icons must be installed!)
+    (doom-themes-neotree-config)
+    ;; or for treemacs users
+    (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+    (doom-themes-treemacs-config)
+    ;; Corrects (and improves) org-mode's native fontification.
+    (doom-themes-org-config))
+#+END_SRC
 ** Zenburn theme
  #+BEGIN_SRC emacs-lisp :tangle no
  (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
@@ -225,12 +245,13 @@ Turn on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Visual-Line-
 ** Org bable
 + Org bable load languages
  #+BEGIN_SRC emacs-lisp
- (org-babel-do-load-languages
-  'org-babel-load-languages
-  '(
-    (python . t)
-    (shell . t)
-    ))
+   (org-babel-do-load-languages
+    'org-babel-load-languages
+    '(
+      (python . t)
+      (shell . t)
+      (js . t)
+      ))
  #+END_SRC
 
 +  Org bable no confirmation for following languages
@@ -323,6 +344,12 @@ These are having some issues with toto font size being too small so check it out
                '("py" "#+BEGIN_SRC python\n?\n#+END_SRC"))
   (add-to-list 'org-structure-template-alist
                '("sh" "#+BEGIN_SRC shell\n?\n#+END_SRC"))
+  (add-to-list 'org-structure-template-alist
+               '("js" "#+BEGIN_SRC js\n?\n#+END_SRC"))
+  (add-to-list 'org-structure-template-alist
+               '("html" "#+BEGIN_SRC html\n?\n#+END_SRC"))
+  (add-to-list 'org-structure-template-alist
+               '("css" "#+BEGIN_SRC css\n?\n#+END_SRC"))
 #+END_SRC
 
 Org tempo can also be used. 
@@ -478,6 +505,14 @@ For inserting standard snippets and making
 ** Magit
 #+BEGIN_SRC emacs-lisp
   (use-package magit)
+#+END_SRC
+** HTMLIZE
+#+BEGIN_SRC emacs-lisp
+  (use-package htmlize)
+ ; (use-package ox-publish)
+  (setq   org-html-htmlize-output-type 'css     ;; Instead of using inline css for each element
+          org-html-doctype "html5"
+          org-html-html5-fancy nil)
 #+END_SRC
 * Custom functions
 ** Kill word improvement
