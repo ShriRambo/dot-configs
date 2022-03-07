@@ -144,7 +144,7 @@ Not working porperly
                               (?\ . ?\))
                               (?\[ . ?\])
                               (?\" . ?\")
-                              ))
+                              )
   (electric-pair-mode t)
 #+END_SRC
 ** Hungry delete 
@@ -285,7 +285,7 @@ And log it to a drawer
 
   ; :custom (org-bullet-list '("" "" "" "" ))
   ;  :config
-  ;  (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
+  ;  (add-hook 'org-mode-hook (lambda () (org-bullets-mode)))
 #+END_SRC
 ** Elipsis
 The end of the heading character that will show that the heading is folded
@@ -449,7 +449,7 @@ This change willnot just split window but also follow to the new window.
       :config
       (ivy-mode 1))
 #+END_SRC
-** Counsel for minibuffer help (comes with ivy)
+** Counsel for minibuffer help comes with ivy
 #+BEGIN_SRC emacs-lisp 
   (use-package counsel
       :ensure t
@@ -513,6 +513,19 @@ For inserting standard snippets and making
   (setq   org-html-htmlize-output-type 'css     ;; Instead of using inline css for each element
           org-html-doctype "html5"
           org-html-html5-fancy nil)
+#+END_SRC
+** Git gutter
+#+BEGIN_SRC emacs-lisp
+  (use-package git-gutter
+    :hook (prog-mode . git-gutter-mode)
+    :config
+    (setq git-gutter:update-interval 0.02))
+
+  (use-package git-gutter-fringe
+    :config
+    (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
 #+END_SRC
 * Custom functions
 ** Kill word improvement
