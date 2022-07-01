@@ -266,6 +266,12 @@ Turn on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Visual-Line-
      #+BEGIN_SRC emacs-lisp
      (setq org-babel-python-command "python3")
       #+END_SRC
++ Org html export, preserve indentation in src blocks
+#+BEGIN_SRC emacs-lisp
+  (setq ;org-edit-src-content-indentation 0
+        ;org-src-tab-acts-natively t
+        org-src-preserve-indentation t)
+#+END_SRC
 ** Org todo->done log time stamp
 Log a timestamp when a TODO is changed to DONE state
 #+BEGIN_SRC emacs-lisp
