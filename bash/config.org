@@ -1,0 +1,95 @@
+#+TITLE: Bash configuration
+#+AUTHOR: Shriram Ashirgade
+#+STARTUP: content  hidestars indent
+#+date: 29th of Aug, 2022
+
+
+* Aliases
+Collection of some handy aliases to be used.
+** Aliases to easily change directories
+#+BEGIN_SRC bash :tangle .bash_aliases
+alias ~="cd ~"        # cd to home
+alias ..="cd .."      # cd up
+alias ...="cd ../.."  # cd up up
+#+END_SRC
+
+** To activate python venv
+Just type ~venv~ to activate python venv if exist in the current folder
+#+BEGIN_SRC shell :tangle .bash_aliases
+alias venv='source venv/bin/activate'
+#+END_SRC
+
+** ssh aliases
+Some aliases to simply ssh into machines
+#+BEGIN_SRC bash :tangle .bash_aliases
+#alias ssh-m1='ssh user@machine' # Edit this manually
+#+END_SRC
+
+** Dir tree alias
+List dir structure as a tree.
+#+BEGIN_SRC bash :tangle no
+alias tree="find . -print | sed -e 's;[^/]*/;|____;g;s;____|;  |;g'" 
+#+END_SRC
+Note: Use package ~tree~ instead of this for much more functionality
+
+** ls aliases
+For pretty printing list
+#+BEGIN_SRC bash :tangle .bash_aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+#+END_SRC
+
+** Emacs in terminal
+To quickly open emacs in terminal mode
+#+BEGIN_SRC bash  :tangle .bash_aliases
+alias emacst="emacs -nw"
+#+END_SRC
+
+** Ranger in current dir
+To open ranger in the current dir
+#+BEGIN_SRC  bash :tangle .bash_aliases
+alias ranger=". ranger"
+#+END_SRC
+Note: This requires ranger to be installed.
+
+** Load inputrc in bashrc
+#+BEGIN_SRC bash :tangle .bashrc
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+#+END_SRC
+
+* Bindings
+
+#+BEGIN_SRC bash :tangle .inputrc
+"\e[A": history-search-backward
+"\e[B": history-search-forward
+"\e[C": forward-char
+"\e[D": backward-char
+set completion-ignore-case On
+#+END_SRC
+
+* App specific configurations
+
+** fzf: A command linefuzzy finder
+Copy and source the default key binding bash file if do not exist and source it
+#+BEGIN_SRC bash :tangle .bashrc
+if [ ! -f ~/.fzf.bash ]; then
+    FZF_BASH=$(dpkg -L fzf | grep bindings.bash || false)
+    if [ $FZF_BASH != "false" ]; then
+        cp $FZF_BASH ~/.fzf.bash
+    fi 
+fi
+
+source ~./.fzf.bash
+#+END_SRC
+
+* Apply changes
+Copy the file to the required location
+Go to the code below and press ~C-c~ and then confirm yes
+#+BEGIN_SRC shell :results none
+ # cp config.org ~/.emacs.d/config.org
+#+END_SRC
+
+And reload bash
