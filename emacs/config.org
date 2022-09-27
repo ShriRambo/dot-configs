@@ -44,7 +44,7 @@ This downloads ~use-package~ package if not installed.
     ;; Global settings (defaults)
     (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
           doom-themes-enable-italic t) ; if nil, italics is universally disabled
-    (load-theme 'doom-gruvbox t)
+    (load-theme 'doom-tomorrow-night t)
 
     ;; Enable flashing mode-line on errors
     (doom-themes-visual-bell-config)
@@ -554,6 +554,65 @@ For inserting standard snippets and making
     (kill-word 1))
   (global-set-key (kbd "M-d") 'kill-whole-word)	     
 #+END_SRC
+
+* lsp mode
+This mode helps design IDE for different programming interfaces.
+#+BEGIN_SRC emacs-lisp
+(defun rambo/lsp-mode-setup ()
+  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (lsp-headerline-breadcrumb-mode))
+
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :hook (lsp-mode . rambo/lsp-mode-setup)
+  :init  (setq lsp-keymap-prefix "C-c l")
+  :config
+  (lsp-enable-which-key-integration t)
+  )
+#+END_SRC
+
+** Breadcrumbs on top
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
+
+** Company mode
+
+#+BEGIN_SRC emacs-lisp
+(use-package company
+  :after lsp-mode
+  :hook (lsp-mode . company-mode)
+  :bind
+  (:map company-active-map
+	      ("<tab>" . company-indent-or-complete-common))
+  (:map lsp-mode-map
+	("<tab>" . company-indent-or-complete-common))
+  :custom
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0.0))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(use-package company-box
+  :hook (company-mode . company-box-mode))
+#+END_SRC
+
+** lsp-ui
+#+BEGIN_SRC emacs-lisp
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  ;:custom
+  ;(lsp-ui-doc-position 'bottom)
+  )
+#+END_SRC
+
+** lsp-ivy
+#+BEGIN_SRC emacs-lisp
+(use-package lsp-ivy)
+#+END_SRC
+
+** Additional keybindings
+*** TODO Keybinding for comment-or-uncomment
 * To do someday [0/9]
 ** TODO Autocomplete? Company? 
 ** TODO Startup dashboard something    
