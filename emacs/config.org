@@ -137,9 +137,9 @@ Instead of typing full *yes* or *no*, we just write *y* or *n*. Save some time f
 #+BEGIN_SRC emacs-lisp
   (global-subword-mode 1)
 #+END_SRC
-** TODO Electric pairs
-Not working porperly
-#+BEGIN_SRC emacs-lisp :tangle no
+** Electric pairs
+Closing matching brackets and quotes.
+#+BEGIN_SRC emacs-lisp 
 (setq electric-pair-pairs
       '( (?\( . ?\))
 	 (?\[ . ?\])
@@ -148,6 +148,7 @@ Not working porperly
 
 (electric-pair-mode t)
 #+END_SRC
+
 ** Hungry delete 
 To remove all lagging spaces all at once
 #+BEGIN_SRC emacs-lisp
