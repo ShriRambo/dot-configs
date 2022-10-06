@@ -140,12 +140,13 @@ Instead of typing full *yes* or *no*, we just write *y* or *n*. Save some time f
 ** TODO Electric pairs
 Not working porperly
 #+BEGIN_SRC emacs-lisp :tangle no
-  (setq electric-pair-pairs '(
-                              (?\ . ?\))
-                              (?\[ . ?\])
-                              (?\" . ?\")
-                              )
-  (electric-pair-mode t)
+(setq electric-pair-pairs
+      '( (?\( . ?\))
+	 (?\[ . ?\])
+	 (?\" . ?\")
+	 (?\{ . ?\}) ))
+
+(electric-pair-mode t)
 #+END_SRC
 ** Hungry delete 
 To remove all lagging spaces all at once
@@ -610,9 +611,17 @@ This mode helps design IDE for different programming interfaces.
 #+BEGIN_SRC emacs-lisp
 (use-package lsp-ivy)
 #+END_SRC
-
 ** Additional keybindings
 *** TODO Keybinding for comment-or-uncomment
+
+** Python lsp 
+#+BEGIN_SRC emacs-lisp
+(use-package python-mode
+  :ensure t
+  :hook (python-mode . lsp-deferred)
+  :custom
+  (python-shell-interpreter "python3"))
+#+END_SRC
 * To do someday [0/9]
 ** TODO Autocomplete? Company? 
 ** TODO Startup dashboard something    
