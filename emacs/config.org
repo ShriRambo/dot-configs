@@ -20,7 +20,7 @@ Reduce garbage collection frequency and print startup time on every startup.
                      gcs-done)))
 #+END_SRC
 
-* Package management
+* 📦 Package management
 ** Use [[https://melpa.org/#/][MELPA]] for package archive
 Adding melpa package repository and initializint
 #+begin_src emacs-lisp
@@ -46,7 +46,7 @@ This downloads ~use-package~ package if not installed.
   (require 'use-package)
   (setq use-package-always-ensure t)
 #+end_src
-* Theme
+* 🎨 Theme
 ** VSCode dark theme
  #+BEGIN_SRC emacs-lisp :tangle no
  (use-package vscode-dark-plus-theme
@@ -90,7 +90,7 @@ This downloads ~use-package~ package if not installed.
 
    (add-hook 'window-setup-hook 'on-after-init)
    #+END_SRC
-* Mode line
+* ⚔ Mode line
 ** Doom modeline
 Description
 #+BEGIN_SRC emacs-lisp
@@ -98,7 +98,7 @@ Description
   :ensure t
   :hook (after-init . doom-modeline-mode))
 #+END_SRC
-* Basic UX settings
+* 🦠 Basic UX settings
 ** Startup screen
 Startup do not include help page
 #+BEGIN_SRC emacs-lisp
@@ -261,7 +261,7 @@ Turn on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Visual-Line-
 (add-hook 'text-mode-hook 'visual-line-mode)
 (add-hook 'org-mode 'visual-line-mode)
 #+end_src
-* Org mode
+* 🦄 Org mode
 ** Org bable
 + Org bable load languages
  #+BEGIN_SRC emacs-lisp
@@ -393,7 +393,7 @@ To make org documents more beautiful, add support for emoji with =emojify= packa
   :hook (org-mode . emojify-mode)
   :commands emojify-mode)
 #+END_SRC
-* Moving around
+* 🚶🏽 Moving around
 ** Ido
 I do this and I do that
 ~C-x C-f~ for using IDO to find file
@@ -516,7 +516,7 @@ Some helpful transformations for ~Ivy~ and ~Counsel~
      ([remap describe-key] .  helpful-key))
 #+END_SRC
 
-* Others
+* 🦦 Others
 ** Rainbow
 For generative work (shows colors with that color background)
 #+BEGIN_SRC emacs-lisp :tangle no
@@ -572,7 +572,7 @@ For inserting standard snippets and making
     (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
 
 #+END_SRC
-* Custom functions
+* 🗿 Custom functions
 ** Kill word improvement
 #+BEGIN_SRC emacs-lisp
   (defun kill-whole-word ()
@@ -582,7 +582,7 @@ For inserting standard snippets and making
   (global-set-key (kbd "M-d") 'kill-whole-word)	     
 #+END_SRC
 
-* lsp mode
+* 🧬 lsp-mode
 This mode helps design IDE for different programming interfaces.
 #+BEGIN_SRC emacs-lisp
 (defun rambo/lsp-mode-setup ()
@@ -648,7 +648,7 @@ This mode helps design IDE for different programming interfaces.
   :custom
   (python-shell-interpreter "python3"))
 #+END_SRC
-* To do someday [0/7]
+* 💡 To do someday [0/7]
 ** TODO Autocomplete? Company? 
 ** TODO Startup dashboard something
 ** TODO [[https://github.com/DarthFennec/highlight-indent-guides][Indentation highlight]]
@@ -656,7 +656,7 @@ This mode helps design IDE for different programming interfaces.
 [[https://www.youtube.com/watch?v=C7ZlNRbWdVI][System Crafters video]]
 ** TODO [[https://github.com/noctuid/general.el][Geleral.el]] For managing keybindings
 ** TODO  Using noweb to better organize config
-* Archives
+* 🗃 Archives
 The configuration wihich is not in use anymore
 **  Ivy switch buffer improvement
 #+BEGIN_SRC emacs-lisp :tangle no
@@ -688,7 +688,7 @@ The configuration wihich is not in use anymore
       :config ((setq counsel-describe-function-function #'helpful-callable)
               (setq counsel-describe-variable-function #'helpful-variable)))
 #+END_SRC
-* Apply changes
+* 👾 Apply changes
 Copy the file to the required location
 Go to the code below and press ~C-c~ and then confirm yes
 #+BEGIN_SRC shell :results none
