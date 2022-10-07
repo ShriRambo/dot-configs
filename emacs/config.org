@@ -146,7 +146,7 @@ Closing matching brackets and quotes.
 	 (?\" . ?\")
 	 (?\{ . ?\}) ))
 
-(electric-pair-mode t)
+(electric-pair-mode)
 #+END_SRC
 
 ** Hungry delete 
