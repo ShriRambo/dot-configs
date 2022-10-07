@@ -3,18 +3,36 @@
 #+STARTUP: content  hidestars indent
 #+date: 2022:01:01
 
+* Startup Performance
+Reduce garbage collection frequency and print startup time on every startup.
+
+#+BEGIN_SRC emacs-lisp
+;; The default is 800 kilobytes.  Measured in bytes.
+(setq gc-cons-threshold (* 50 1000 1000))
+
+;; Profile emacs startup
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "Emacs loaded in %s with %d garbage collections."
+                     (format "%.2f seconds"
+                             (float-time
+                              (time-subtract after-init-time before-init-time)))
+                     gcs-done)))
+#+END_SRC
+
 * Package management
 ** Use [[https://melpa.org/#/][MELPA]] for package archive
 Adding melpa package repository and initializint
 #+begin_src emacs-lisp
-  (require 'package)
-  (add-to-list 'package-archives 
-                 '("melpa" . "https://melpa.org/packages/") t)
-  ;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
-  ;; and `package-pinned-packages`. Most users will not need or want to do this.
-  ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
-  (package-initialize)
+(require 'package)
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("melpa-stable" . "https://stable.melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
+
+(package-initialize)
 #+end_src
+
 Note that you'll need to run ~M-x package-refresh-contents~ or ~M-x package-list-packages~ to ensure that Emacs has fetched the MELPA package list before you can install packages with M-x package-install or similar. Following does that automatically
 #+BEGIN_SRC emacs-lisp
   (unless package-archive-contents
@@ -368,6 +386,13 @@ Do not split while editing ~src~ with ~C-c '~
 #+BEGIN_SRC emacs-lisp :tangle no
   (setq org-src-window-setup 'current-window)
 #+END_SRC
+** Emoji in org buffer
+To make org documents more beautiful, add support for emoji with =emojify= package.
+#+BEGIN_SRC emacs-lisp
+(use-package emojify
+  :hook (org-mode . emojify-mode)
+  :commands emojify-mode)
+#+END_SRC
 * Moving around
 ** Ido
 I do this and I do that
@@ -623,14 +648,14 @@ This mode helps design IDE for different programming interfaces.
   :custom
   (python-shell-interpreter "python3"))
 #+END_SRC
-* To do someday [0/9]
+* To do someday [0/7]
 ** TODO Autocomplete? Company? 
-** TODO Startup dashboard something    
-** TODO Git changes in side gutter/fringes
+** TODO Startup dashboard something
 ** TODO [[https://github.com/DarthFennec/highlight-indent-guides][Indentation highlight]]
 ** TODO Tab bar mode
 [[https://www.youtube.com/watch?v=C7ZlNRbWdVI][System Crafters video]]
-* TODO  Using noweb to better organize config
+** TODO [[https://github.com/noctuid/general.el][Geleral.el]] For managing keybindings
+** TODO  Using noweb to better organize config
 * Archives
 The configuration wihich is not in use anymore
 **  Ivy switch buffer improvement
