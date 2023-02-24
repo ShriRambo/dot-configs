@@ -1,7 +1,7 @@
 #+TITLE: Dotfile Repository
 #+AUTHOR: Shriram Ashirgade
 #+STARTUP: content  hidestars indent
-#+date: 2022:02:08
+#+date: [2022-02-08]
 
 
 This repository contains literate configuratoin files for the applications I use.

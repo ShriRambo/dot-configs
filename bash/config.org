@@ -1,7 +1,7 @@
 #+TITLE: Bash configuration
 #+AUTHOR: Shriram Ashirgade
 #+STARTUP: content  hidestars indent
-#+date: 29th of Aug, 2022
+#+DATE:  [2022-08-29]
 
 
 * Aliases

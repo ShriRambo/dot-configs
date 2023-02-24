@@ -1,7 +1,7 @@
 #+TITLE: Emacs config in org mode
 #+AUTHOR: Shriram Ashirgade
 #+STARTUP: content  hidestars indent
-#+date: 2022:01:01
+#+DATE: [2022-01-01]
 
 * Startup Performance
 Reduce garbage collection frequency and print startup time on every startup.
