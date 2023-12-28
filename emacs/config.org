@@ -27,7 +27,6 @@ Adding melpa package repository and initializint
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("melpa-stable" . "https://stable.melpa.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")
                          ("elpa" . "https://elpa.gnu.org/packages/")))
 
 (package-initialize)
@@ -157,14 +156,14 @@ Instead of typing full *yes* or *no*, we just write *y* or *n*. Save some time f
 #+END_SRC
 ** Electric pairs
 Closing matching brackets and quotes.
-#+BEGIN_SRC emacs-lisp 
+#+BEGIN_SRC emacs-lisp :tangle no
 (setq electric-pair-pairs
       '( (?\( . ?\))
 	 (?\[ . ?\])
 	 (?\" . ?\")
 	 (?\{ . ?\}) ))
 
-(electric-pair-mode)
+(add-hook prog-mode-hook electric-pair-mode)
 #+END_SRC
 
 ** Hungry delete 
@@ -186,8 +185,8 @@ Only for prog mode?
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
     :ensure t
-    :hook ((prog-mode . rainbow-delimiters-mode)
-           (org-mode . rainbow-delimiters-mode)))
+    :hook ((prog-mode . rainbow-delimiters-mode)))
+          ; (org-mode . rainbow-delimiters-mode)))
 #+END_SRC
 ** Fancy killring
 #+BEGIN_SRC emacs-lisp
@@ -262,6 +261,21 @@ Turn on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Visual-Line-
 (add-hook 'org-mode 'visual-line-mode)
 #+end_src
 * 🦄 Org mode
+** Pin Org mode
+#+begin_src emacs-lisp
+(use-package org
+  :pin elpa)
+#+end_src
+** Capture
+Location where all captured notes will go. All the org roam files are also in the same folder
+#+begin_src emacs-lisp
+(setq org-default-notes-file  "~/notes/inbox.org")
+#+end_src
+
+** Agenda
+#+begin_src emacs-lisp
+(setq org-agenda-files '("~/notes/"))
+#+end_src
 ** Org bable
 + Org bable load languages
  #+BEGIN_SRC emacs-lisp
@@ -363,7 +377,7 @@ These are having some issues with toto font size being too small so check it out
   ;(add-hook 'org-mode-hook 'variable-pitch-mode)
 #+END_SRC
 ** Snippets
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (add-to-list 'org-structure-template-alist
                '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
   (add-to-list 'org-structure-template-alist
@@ -378,7 +392,11 @@ These are having some issues with toto font size being too small so check it out
                '("css" "#+BEGIN_SRC css\n?\n#+END_SRC"))
 #+END_SRC
 
-Org tempo can also be used. 
+Org tempo can also be used.
+
+#+BEGIN_SRC emacs-lisp
+(require 'org-tempo)
+#+END_SRC
 
 ** Gen config
 *** Src edit window no split
@@ -398,7 +416,7 @@ To make org documents more beautiful, add support for emoji with =emojify= packa
 (use-package org-roam
   :ensure t
   :custom
-  (org-roam-directory "~/roamhome")
+  (org-roam-directory "~/notes")
   :bind (("C-c n l" . org-roam-buffer-toggle)
 	 ("C-c n f" . org-roam-node-find)
 	 ("C-c n i" . org-roam-node-insert))
