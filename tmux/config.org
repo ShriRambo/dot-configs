@@ -1,0 +1,25 @@
+#+TITLE: Dotfile Repository
+#+AUTHOR: Shriram Ashirgade
+#+STARTUP: content  hidestars indent
+#+DATE: [2024-01-27]
+
+
+* [[https://github.com/tmux-plugins/tpm][Tmux Plugin Manager]]
+Clone the repository at ~~/.tmux/plugins/tpm~ At the bottom of the ~.tmux~ file, add ~run '~~/.tmux/plugins/tpm/tpm'~ To add plugins, ~set -g @plugin 'git/clone/url/of/the/plugin'~
+
+** Shortcuts
+- ~prefix + I~ to install plugin
+- ~prefix + U~ to update plugin
+- ~prefix + alt + u~ to remove plugins not in the list
+  
+* Basic settings
+
+** Allow Mouse Scroll
+Using mouse interactions like scroll and resizing of paned in tmux window.
+
+#+BEGIN_SRC:
+    set -g mouse on
+#+END_SRC
+
+* Plugins
+
