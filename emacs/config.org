@@ -78,6 +78,9 @@ This downloads ~use-package~ package if not installed.
  (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
  (load-theme 'zenburn-theme t)
  #+END_SRC
+
+* 🍉 Terminal specific settings
+   
 ** No background in terminal mode
    Do not use theme background in terminal mode
    So we can use classic terminal view
@@ -89,6 +92,19 @@ This downloads ~use-package~ package if not installed.
 
    (add-hook 'window-setup-hook 'on-after-init)
    #+END_SRC
+
+** Enable Xterm-mouse-mode
+
+   #+BEGIN_SRC emacs-lisp
+   (defun enable-xterm-mouse-mode/rambo ()
+     (unless (display-graphic-p (selected-frame))
+       (xterm-mouse-mode t)))
+
+   (add-hook 'window-setup-hook 'enable-xterm-mouse-mode/rambo)
+   #+END_SRC
+
+     
+   
 * ⚔ Mode line
 ** Doom modeline
 Description
