@@ -88,7 +88,8 @@ This downloads ~use-package~ package if not installed.
    ;; No background when in terminal mode (to use default terminal background )
    (defun on-after-init ()
      (unless (display-graphic-p (selected-frame))
-       (set-face-background 'default "unspecified-bg" (selected-frame))))
+       (set-face-background 'default "unspecified-bg" (selected-frame))
+       (set-face-background 'org-block "unspecified-bg" (selected-frame))))
 
    (add-hook 'window-setup-hook 'on-after-init)
    #+END_SRC
@@ -128,8 +129,12 @@ Second config command adds multiline mode to neotree so that long file names are
 (use-package neotree
    :ensure t
    :config
-   (add-hook 'emacs-startup-hook 'neotree)
-   (add-hook 'neotree-mode-hook 'visual-line-mode))
+   ; Load neotree on startup
+   ;(add-hook 'emacs-startup-hook 'neotree)
+   ; Visual line mode on neotree biffer
+   (add-hook 'neotree-mode-hook 'visual-line-mode)
+   :bind
+   ("C-a" . neotree-toggle))
 #+END_SRC
 ** Fancy icons in GUI
 Display fancy icons when in gui 
@@ -609,7 +614,7 @@ For inserting standard snippets and making
   (set-face-foreground 'git-gutter:added "LightGreen")
   (set-face-foreground 'git-gutter:modified "LightGoldenrod")
   (set-face-foreground 'git-gutter:deleted "LightCoral"))
-
+ 
   (use-package git-gutter-fringe
     :config
     (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
