@@ -417,6 +417,9 @@ Org tempo can also be used.
 
 #+BEGIN_SRC emacs-lisp
 (require 'org-tempo)
+(add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+(add-to-list 'org-structure-template-alist '("py" . "src python"))
 #+END_SRC
 
 ** Gen config
@@ -425,6 +428,8 @@ Do not split while editing ~src~ with ~C-c '~
 #+BEGIN_SRC emacs-lisp :tangle no
   (setq org-src-window-setup 'current-window)
 #+END_SRC
+
+
 ** Emoji in org buffer
 To make org documents more beautiful, add support for emoji with =emojify= package.
 #+BEGIN_SRC emacs-lisp
@@ -637,6 +642,7 @@ This mode helps design IDE for different programming interfaces.
 #+BEGIN_SRC emacs-lisp
 (defun rambo/lsp-mode-setup ()
   (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (lsp-headline-breadcrumb-icons-enable t)
   (lsp-headerline-breadcrumb-mode))
 
 (use-package lsp-mode
@@ -682,7 +688,11 @@ This mode helps design IDE for different programming interfaces.
   ;(lsp-ui-doc-position 'bottom)
   )
 #+END_SRC
-
+** Sideline
+#+BEGIN_SRC emacs-lisp
+(setq lsp-ui-sideline-enable nil)
+(setq lsp-ui-sideline-show-hover nil)
+#+END_SRC
 ** lsp-ivy
 #+BEGIN_SRC emacs-lisp
 (use-package lsp-ivy)
