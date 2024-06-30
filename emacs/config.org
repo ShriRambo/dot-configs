@@ -403,6 +403,14 @@ Turn on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Visual-Line-
 (add-hook 'text-mode-hook 'visual-line-mode)
 (add-hook 'org-mode 'visual-line-mode)
 #+end_src
+
+** Dired
+Using nerd-icons in dired
+#+begin_src emacs-lisp
+(use-package nerd-icons-dired
+	:hook
+	(dired-mode . nerd-icons-dired-mode))
+#+end_src
 * 🦄 Org mode
 ** Pin Org mode
 #+begin_src emacs-lisp
@@ -837,7 +845,7 @@ This mode helps design IDE for different programming interfaces.
   :custom
   (python-shell-interpreter "python3"))
 #+END_SRC
-* 💡 To do someday [0/7]
+* 💡 To do someday [0/6]
 ** TODO Autocomplete? Company? 
 ** TODO Startup dashboard something
 ** TODO [[https://github.com/DarthFennec/highlight-indent-guides][Indentation highlight]]
