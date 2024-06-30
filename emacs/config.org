@@ -251,7 +251,12 @@ Second config command adds multiline mode to neotree so that long file names are
   :after (treemacs)
   :ensure t
   :config (treemacs-set-scope-type 'Tabs))
-#+end_src
+
+; Nerd icons for treemacs
+(use-package treemacs-nerd-icons
+  :config
+  (treemacs-load-theme "nerd-icons"))
+  #+end_src
 ** Fancy icons in GUI
 Display fancy icons when in gui 
 #+BEGIN_SRC emacs-lisp :tangle no
@@ -842,7 +847,7 @@ This mode helps design IDE for different programming interfaces.
 ** TODO  Using noweb to better organize config
 * 🗃 Archives
 The configuration wihich is not in use anymore
-**  Ivy switch buffer improvement
+** Ivy switch buffer improvement
 #+BEGIN_SRC emacs-lisp :tangle no
   (use-package ivy
     :diminish
