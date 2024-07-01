@@ -86,22 +86,20 @@ This downloads ~use-package~ package if not installed.
    So we can use classic terminal view
    #+BEGIN_SRC emacs-lisp
    ;; No background when in terminal mode (to use default terminal background )
-   (defun rambo/no-bg-in-term ()
-     (unless (display-graphic-p (selected-frame))
-       (set-face-background 'default "unspecified-bg" (selected-frame))
-       (set-face-background 'org-block "unspecified-bg" (selected-frame))))
+(defun rambo/no-bg-in-term ()
+  (unless (display-graphic-p (selected-frame))
+    (set-face-background 'default "unspecified-bg" (selected-frame))))
 
-   (add-hook 'window-setup-hook 'rambo/no-bg-in-term)
+(add-hook 'window-setup-hook 'rambo/no-bg-in-term)
+
+; Seet org block background to unspec
+(set-face-background 'org-block "unspecified-bg")
    #+END_SRC
 
 ** Enable Xterm-mouse-mode
-
+To be able to click-around with mouse
    #+BEGIN_SRC emacs-lisp
-   (defun enable-xterm-mouse-mode/rambo ()
-     (unless (display-graphic-p (selected-frame))
-       (xterm-mouse-mode t)))
-
-   (add-hook 'window-setup-hook 'enable-xterm-mouse-mode/rambo)
+   (xterm-mouse-mode t)
    #+END_SRC
 * ⚔ Mode line
 ** Doom modeline
