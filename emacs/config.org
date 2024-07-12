@@ -549,8 +549,10 @@ To jump around buffer/windows
   (use-package ace-jump-mode
     :ensure t
     :bind
-    ("M-s" . 'ace-jump-char-mode)
-    ("C-x o" . 'ace-window))
+    ("M-s" . 'ace-jump-mode)
+    ("C-x j c" . 'ace-jump-char-mode)
+    ("C-x j w" . 'ace-jump-word-mode)
+    ("C-x j l" . 'ace-jump-line-mode))
 #+END_SRC
 ** Split window improvement
 This change willnot just split window but also follow to the new window.
