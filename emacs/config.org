@@ -111,10 +111,8 @@ Description
 #+END_SRC
 * 🦠 Basic UX settings
 ** Startup screen
-Startup
-do not include help page dssdsdd
+Disable splash screen
 #+BEGIN_SRC emacs-lisp
-;; Disable the splash screen (to enable it agin, replace the t with 0)
 (setq inhibit-splash-screen 0)
 #+END_SRC
 ** Neo tree side buffer
@@ -132,75 +130,24 @@ Second config command adds multiline mode to neotree so that long file names are
    :bind
    ("C-a" . neotree-toggle))
 #+END_SRC
-** Treemacs [Jsut testing]
+Deprecated in favour of ~Treemacs~
+** [[https://github.com/Alexander-Miller/treemacs][Treemacs]]
+
 #+begin_src emacs-lisp
 (use-package treemacs
   :ensure t
   :defer t
-  :init
-  (with-eval-after-load 'winum
-    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
   :config
   (progn
-    (setq treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
-          treemacs-deferred-git-apply-delay        0.5
-          treemacs-directory-name-transformer      #'identity
-          treemacs-display-in-side-window          t
-          treemacs-eldoc-display                   'simple
-          treemacs-file-event-delay                2000
-          treemacs-file-extension-regex            treemacs-last-period-regex-value
-          treemacs-file-follow-delay               0.2
-          treemacs-file-name-transformer           #'identity
-          treemacs-follow-after-init               t
-          treemacs-expand-after-init               t
-          treemacs-find-workspace-method           'find-for-file-or-pick-first
-          treemacs-git-command-pipe                ""
-          treemacs-goto-tag-strategy               'refetch-index
-          treemacs-header-scroll-indicators        '(nil . "^^^^^^")
-          treemacs-hide-dot-git-directory          nil
-          treemacs-indentation                     2
-          treemacs-indentation-string              " "
-          treemacs-is-never-other-window           nil
-          treemacs-max-git-entries                 5000
-          treemacs-missing-project-action          'ask
-          treemacs-move-files-by-mouse-dragging    t
-          treemacs-move-forward-on-expand          nil
-          treemacs-no-png-images                   nil
-          treemacs-no-delete-other-windows         t
-          treemacs-project-follow-cleanup          nil
-          treemacs-persist-file                    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
-          treemacs-position                        'left
-          treemacs-read-string-input               'from-child-frame
-          treemacs-recenter-distance               0.1
-          treemacs-recenter-after-file-follow      nil
-          treemacs-recenter-after-tag-follow       nil
-          treemacs-recenter-after-project-jump     'always
-          treemacs-recenter-after-project-expand   'on-distance
-          treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
-          treemacs-project-follow-into-home        nil
-          treemacs-show-cursor                     nil
-          treemacs-show-hidden-files               t
-          treemacs-silent-filewatch                nil
-          treemacs-silent-refresh                  nil
-          treemacs-sorting                         'alphabetic-asc
-          treemacs-select-when-already-in-treemacs 'move-back
-          treemacs-space-between-root-nodes        t
-          treemacs-tag-follow-cleanup              t
-          treemacs-tag-follow-delay                1.5
-          treemacs-text-scale                      nil
-          treemacs-user-mode-line-format           nil
-          treemacs-user-header-line-format         nil
-          treemacs-wide-toggle-width               25
-          treemacs-width                           25
-          treemacs-width-increment                 1
-          treemacs-width-is-initially-locked       nil
-          treemacs-workspace-switch-cleanup        nil)
+    (setq treemacs-width                           25
+          treemacs-width-is-initially-locked       nil)
 
     ;; The default width and height of the icons is 22 pixels. If you are
     ;; using a Hi-DPI display, uncomment this to double the icon size.
     ;;(treemacs-resize-icons 44)
 
     (treemacs-follow-mode t)
+    (treemacs-indent-guide-mode t)
     (treemacs-filewatch-mode t)
     (treemacs-fringe-indicator-mode 'always)
     (when treemacs-python-executable
@@ -224,10 +171,7 @@ Second config command adds multiline mode to neotree so that long file names are
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
 
-;(use-package treemacs-evil
- ; :after (treemacs evil)
- ; :ensure t)
-
+; Oher additions for treemacs
 (use-package treemacs-projectile
   :after (treemacs projectile)
   :ensure t)
@@ -240,11 +184,6 @@ Second config command adds multiline mode to neotree so that long file names are
   :after (treemacs magit)
   :ensure t)
 
-;(use-package treemacs-persp ;;treemacs-perspective if you use perspective.el vs. persp-mode
- ; :after (treemacs persp-mode) ;;or perspective vs. persp-mode
-  ;:ensure t
-  ;:config (treemacs-set-scope-type 'Perspectives))
-
 (use-package treemacs-tab-bar ;;treemacs-tab-bar if you use tab-bar-mode
   :after (treemacs)
   :ensure t
@@ -255,16 +194,12 @@ Second config command adds multiline mode to neotree so that long file names are
   :config
   (treemacs-load-theme "nerd-icons"))
   #+end_src
+  
 ** Fancy icons in GUI
 Display fancy icons when in gui 
 #+BEGIN_SRC emacs-lisp :tangle no
 (when (display-graphic-p)
   (require 'all-the-icons))
-#+END_SRC
-** Transient mark mode
-Don't know what it is
-#+BEGIN_SRC emacs-lisp
-(transient-mark-mode 1)
 #+END_SRC
 ** Which key
 #+BEGIN_SRC emacs-lisp
@@ -273,7 +208,7 @@ Don't know what it is
      :init (which-key-mode)
      :config (setq which-key-idle-delay 0.7))
 #+END_SRC
-** Yes or no ==>  y or n
+** Yes or No to y or n
 Instead of typing full *yes* or *no*, we just write *y* or *n*. Save some time for your girl.
 #+BEGIN_SRC emacs-lisp
   (defalias 'yes-or-no-p 'y-or-n-p)
@@ -296,14 +231,8 @@ Instead of typing full *yes* or *no*, we just write *y* or *n*. Save some time f
 #+END_SRC
 ** Electric pairs
 Closing matching brackets and quotes.
-#+BEGIN_SRC emacs-lisp :tangle no
-(setq electric-pair-pairs
-      '( (?\( . ?\))
-	 (?\[ . ?\])
-	 (?\" . ?\")
-	 (?\{ . ?\}) ))
-
-(add-hook prog-mode-hook electric-pair-mode)
+#+BEGIN_SRC emacs-lisp
+(add-hook 'prog-mode-hook 'electric-pair-mode)
 #+END_SRC
 
 ** Hungry delete 
@@ -334,8 +263,10 @@ Only for prog mode?
     :ensure t
     :bind ("M-y" . popup-kill-ring))
 #+END_SRC
+
 ** Pretty characters mode
-#+BEGIN_SRC emacs-lisp
+This turns common programming keywords and symbol names to actual symbol. While this may be good in some situations, I do not want it enabled by default.
+,#+BEGIN_SRC emacs-lisp :tangle no
   (when window-system
     (use-package pretty-mode
       :ensure t
@@ -825,7 +756,7 @@ This mode helps design IDE for different programming interfaces.
 #+END_SRC
 ** Sideline
 #+BEGIN_SRC emacs-lisp
-(setq lsp-ui-sideline-enable nil)
+(setq lsp-ui-sideline-enable t)
 (setq lsp-ui-sideline-show-hover nil)
 #+END_SRC
 ** lsp-ivy
@@ -843,9 +774,15 @@ This mode helps design IDE for different programming interfaces.
   :custom
   (python-shell-interpreter "python3"))
 #+END_SRC
+
+** Flycheck
+#+begin_src emacs-lisp
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+#+end_src>
 * 💡 To do someday [0/6]
-** TODO Autocomplete? Company? 
-** TODO Startup dashboard something
+** TODO Autocomplete? Company?
 ** TODO [[https://github.com/DarthFennec/highlight-indent-guides][Indentation highlight]]
 ** TODO Tab bar mode
 [[https://www.youtube.com/watch?v=C7ZlNRbWdVI][System Crafters video]]
