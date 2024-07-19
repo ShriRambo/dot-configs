@@ -291,7 +291,7 @@ Removing tool bar on top. Let's be honest, who uses it. ...
 #+END_SRC
 ** CUA mode ( for copy paste )
 Usual C-c C-v for copy paste
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
 ;;; Auto CUA mode
 (cua-mode t)
 (setq cua-auto-tabify-rectangles nil) ;; Don't tabify after rectangle commands
@@ -618,6 +618,20 @@ Some helpful transformations for ~Ivy~ and ~Counsel~
     :config
     (setq ivy-format-function #'ivy-format-function-line))
 #+END_SRC
+** Ivy prescient
+#+begin_src emacs-lisp
+(use-package ivy-prescient
+  :after counsel
+  :config
+  (ivy-prescient-mode 1)
+  (prescient-persist-mode 1))
+
+(setq prescient-sort-length-enable nil)
+
+;(setq prescient-filter-method '(literal fuzzy))
+(setq ivy-prescient-retain-classic-highlighting t)
+(setq ivy-prescient-enable-filtering nil)
+#+end_src
 ** Helpful
 #+BEGIN_SRC emacs-lisp
   (use-package helpful
