@@ -193,6 +193,22 @@ Deprecated in favour of ~Treemacs~
 (use-package treemacs-nerd-icons
   :config
   (treemacs-load-theme "nerd-icons"))
+
+
+(defun aorst/treemacs-setup-title ()
+  (let ((bg (face-attribute 'default :background))
+        (fg (face-attribute 'default :foreground)))
+    (face-remap-add-relative 'header-line
+                             :background bg :foreground fg
+                             :box `(:line-width ,(/ (line-pixel-height) 2) :color ,bg)))
+  (setq header-line-format
+        '((:eval
+           (let* ((text (treemacs-workspace->name (treemacs-current-workspace)))
+                  (extra-align (+ (/ (length text) 2) 1))
+                  (width (- (/ (window-width) 2) extra-align)))
+             (concat (make-string width ?\s) text))))))
+
+(add-hook 'treemacs-mode-hook 'aorst/treemacs-setup-title)
   #+end_src
   
 ** Fancy icons in GUI
@@ -603,6 +619,7 @@ This change willnot just split window but also follow to the new window.
   (use-package counsel
       :ensure t
       :bind (("M-x" . counsel-M-x)
+             ("C-c C-j" . counsel-imenu)
              ("C-x f" . counsel-find-file)
              :map minibuffer-local-map
              ("C-r" . 'counsel-minibuffer-history))
@@ -791,19 +808,56 @@ This mode helps design IDE for different programming interfaces.
   (python-shell-interpreter "python3"))
 #+END_SRC
 
+** Autopep8
+
+#+begin_src emacs-lisp :tangle no
+(use-package py-autopep8
+  :hook ((python-mode) . py-autopep8-mode))
+#+end_src
+** Vue3
+#+begin_src emacs-lisp
+(use-package vue-mode
+  :defer t )
+#+end_src
+
+** Dockerfile
+#+begin_src emacs-lisp
+(use-package dockerfile-mode
+  :defer t)
+#+end_src
+
 ** Flycheck
 #+begin_src emacs-lisp
 (use-package flycheck
   :ensure t
   :init (global-flycheck-mode))
 #+end_src>
-* 💡 To do someday [0/6]
+** Treesitter
+#+begin_src emacs-lisp
+(use-package tree-sitter
+  :hook ((prog-mode . tree-sitter-hl-mode)))
+#+end_src
+
+** Pyvenv
+#+begin_src emacs-lisp
+(setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name ("[venv:" pyvenv-virtual-env-name "] ")))
+#+end_src
+** Flycheck-Projectile
+#+begin_src emacs-lisp
+(use-package flycheck-projectile
+  :load-path "~/.emacs.d/packages/")
+#+end_src
+* 💡 To do someday [0/7]
 ** TODO Autocomplete? Company?
 ** TODO [[https://github.com/DarthFennec/highlight-indent-guides][Indentation highlight]]
 ** TODO Tab bar mode
 [[https://www.youtube.com/watch?v=C7ZlNRbWdVI][System Crafters video]]
 ** TODO [[https://github.com/noctuid/general.el][Geleral.el]] For managing keybindings
 ** TODO  Using noweb to better organize config
+** TODO Projectile on project change activate venv and restart lsp
+** TODO Configure pyvenv
+** TODO Desktop session save
+Check ~desktop save mode~
 * 🗃 Archives
 The configuration wihich is not in use anymore
 ** Ivy switch buffer improvement
@@ -836,6 +890,14 @@ The configuration wihich is not in use anymore
       :config ((setq counsel-describe-function-function #'helpful-callable)
               (setq counsel-describe-variable-function #'helpful-variable)))
 #+END_SRC
+* Desktop save mode
+#+begin_src emacs-lisp :tangle no
+(defun rambo/desktop-save-mode  ()
+  (desktop-save-mode t)
+  (desktop-read))
+
+(add-hook 'after-init-hook 'rambo/desktop-save-mode)
+#+end_src
 * 👾 Apply changes
 Copy the file to the required location
 Go to the code below and press ~C-c~ and then confirm yes
