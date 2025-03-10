@@ -1,6 +1,6 @@
 #+TITLE: Emacs config in org mode
 #+AUTHOR: Shriram Ashirgade
-#+STARTUP: content  hidestars indent
+#+STARTUP: content hidestars indent
 #+DATE: [2022-01-01]
 
 * Startup Performance
@@ -22,7 +22,8 @@ Reduce garbage collection frequency and print startup time on every startup.
 
 * 📦 Package management
 ** Use [[https://melpa.org/#/][MELPA]] for package archive
-Adding melpa package repository and initializint
+Adding melpa package repository and initialize
+
 #+begin_src emacs-lisp
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
@@ -33,10 +34,11 @@ Adding melpa package repository and initializint
 #+end_src
 
 Note that you'll need to run ~M-x package-refresh-contents~ or ~M-x package-list-packages~ to ensure that Emacs has fetched the MELPA package list before you can install packages with M-x package-install or similar. Following does that automatically
-#+BEGIN_SRC emacs-lisp
+
+#+begin_src emacs-lisp
   (unless package-archive-contents
     (package-refresh-contents))
-#+END_SRC
+#+end_src
 ** Make sure that ~use-package~ is loaded
 This downloads ~use-package~ package if not installed.
 #+begin_src emacs-lisp
@@ -45,6 +47,7 @@ This downloads ~use-package~ package if not installed.
   (require 'use-package)
   (setq use-package-always-ensure t)
 #+end_src
+
 * 🎨 Theme
 ** VSCode dark theme
  #+BEGIN_SRC emacs-lisp :tangle no
@@ -53,6 +56,7 @@ This downloads ~use-package~ package if not installed.
    :config
    (load-theme 'vscode-dark-plus t))
  #+END_SRC
+
 ** Doom theme
 #+BEGIN_SRC emacs-lisp
   (use-package doom-themes
@@ -73,29 +77,28 @@ This downloads ~use-package~ package if not installed.
     ;; Corrects (and improves) org-mode's native fontification.
     (doom-themes-org-config))
 #+END_SRC
+
 ** Zenburn theme
  #+BEGIN_SRC emacs-lisp :tangle no
  (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
  (load-theme 'zenburn-theme t)
  #+END_SRC
 
-* 🍉 Terminal specific settings
-   
 ** No background in terminal mode
-   Do not use theme background in terminal mode
-   So we can use classic terminal view
-   #+BEGIN_SRC emacs-lisp
-   ;; No background when in terminal mode (to use default terminal background )
-(defun rambo/no-bg-in-term ()
+Do not use theme background in terminal mode
+So we can use classic terminal view
+#+BEGIN_SRC emacs-lisp
+  ;; No background when in terminal mode (to use default terminal background )
+  (defun rambo/no-bg-in-term ()
   (unless (display-graphic-p (selected-frame))
-    (set-face-background 'default "unspecified-bg" (selected-frame))))
-
-(add-hook 'window-setup-hook 'rambo/no-bg-in-term)
-
-; Seet org block background to unspec
-(set-face-background 'org-block "unspecified-bg")
+  (set-face-background 'default "unspecified-bg" (selected-frame))))
+  
+  (add-hook 'window-setup-hook 'rambo/no-bg-in-term)
+  ;Set org block background to unspec
+  (set-face-background 'org-block "unspecified-bg")
    #+END_SRC
-
+   
+* 🍉 Terminal specific settings 
 ** Enable Xterm-mouse-mode
 To be able to click-around with mouse
    #+BEGIN_SRC emacs-lisp
@@ -108,6 +111,8 @@ Description
 (use-package doom-modeline
   :ensure t
   :hook (after-init . doom-modeline-mode))
+
+(setq doom-modeline-vcs-max-length 30)
 #+END_SRC
 * 🦠 Basic UX settings
 ** Startup screen
@@ -361,11 +366,60 @@ Using nerd-icons in dired
 #+begin_src emacs-lisp
 (use-package org
   :pin elpa)
+(require 'org-mode)
 #+end_src
-** Capture
+** Org Capture
 Location where all captured notes will go. All the org roam files are also in the same folder
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (setq org-default-notes-file  "~/notes/inbox.org")
+#+end_src
+
+Template for Meetings
+#+begin_src emacs-lisp
+(defun rambo/org-capture-template-meeting ()
+  "Generate a dynamic Org capture template string."
+  (concat "*  %?\n"
+      ":PROPERTIES:\n"
+      ":CREATED: %u\n"
+      ":SCHEDULED: %^{Scheduled date}t\n"
+      ":END:\n\n"))
+#+end_src
+
+Template for Tasks to be done Today
+#+begin_src emacs-lisp
+(defun rambo/org-capture-template-todo-today ()
+  "Generate a dynamic Org capture template string."
+  (concat "* TODO %?\n"
+      ":PROPERTIES:\n"
+      ":CREATED: %u\n"
+      ":SCHEDULED: %t\n"
+      ":END:\n\n"))
+#+end_src
+
+Template for Tasks to be done Today
+#+begin_src emacs-lisp
+(defun rambo/org-capture-template-todo-now ()
+  "Generate a dynamic Org capture template string."
+  (concat "* WIP %?\n"
+      ":PROPERTIES:\n"
+      ":CREATED: %u\n"
+      ":SCHEDULED: %t\n"
+      ":END:\n\n"))
+#+end_src
+
+
+Create capture templates:
+#+begin_src emacs-lisp
+(setq org-capture-templates
+      `(("m" "Meeting or Appointment" entry 
+          (file+olp "~/notes/meetings.org" ,(format-time-string "%Y") ,(format-time-string "%B")) 
+          (function rambo/org-capture-template-meeting))
+        ("tt" "Todo Today" entry
+          (file+olp+datetree "~/notes/tasks.org" "Things to do Today")
+          (function rambo/org-capture-template-todo-today))
+        ("tn" "Todo Now" entry
+          (file+olp+datetree "~/notes/tasks.org" "Things to do Today")
+          (function rambo/org-capture-template-todo-now) :prepend t :clock-in t :clock-keep nil :jump-to-captured t )))
 #+end_src
 
 ** Agenda
@@ -410,7 +464,7 @@ Log a timestamp when a TODO is changed to DONE state
 
 And log it to a drawer
 #+BEGIN_SRC emacs-lisp
-  (setq org-log-into-drawer t)
+(setq org-log-into-drawer t)
 #+END_SRC
 
 ** Org Bullets
@@ -418,26 +472,22 @@ And log it to a drawer
   (use-package org-bullets
     :after org
     :hook (org-mode . org-bullets-mode))
-
-  ; :custom (org-bullet-list '("" "" "" "" ))
-  ;  :config
-  ;  (add-hook 'org-mode-hook (lambda () (org-bullets-mode)))
 #+END_SRC
 ** Elipsis
 The end of the heading character that will show that the heading is folded
 #+BEGIN_SRC emacs-lisp
   (setq org-ellipsis " ⤵")
 #+END_SRC
-Other interesting characters are ▼, ↴, ⬎, ⤷, and ⋱ 
+Other interesting characters are ▼ , ↴ , ⬎ , ⤷ , and ⋱ 
 ** Leading stars and indentation
 #+BEGIN_SRC emacs-lisp
   (setq org-startup-indented t
         org-hide-leading-stars t)
 #+END_SRC
 ** Hide emphasis markers
-Hide the ~code~, /italics/ and *bold* _u+nderline_ =verbatim= +strike-through+
+Hide the ~code~, /italics/ and *bold* _underline_ =verbatim= ++strike-through++
 #+BEGIN_SRC emacs-lisp
-  (setq org-hide-emphasis-markers t)
+  (setq org-hide-emphasis-markers nil)
 #+END_SRC 
 ** Pretty symbols
 Show pretty symbols like \lambda instead of \ lambda
@@ -472,24 +522,7 @@ These are having some issues with toto font size being too small so check it out
 #+BEGIN_SRC emacs-lisp
   ;(add-hook 'org-mode-hook 'variable-pitch-mode)
 #+END_SRC
-** Snippets
-#+BEGIN_SRC emacs-lisp :tangle no
-  (add-to-list 'org-structure-template-alist
-               '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
-  (add-to-list 'org-structure-template-alist
-               '("py" "#+BEGIN_SRC python\n?\n#+END_SRC"))
-  (add-to-list 'org-structure-template-alist
-               '("sh" "#+BEGIN_SRC shell\n?\n#+END_SRC"))
-  (add-to-list 'org-structure-template-alist
-               '("js" "#+BEGIN_SRC js\n?\n#+END_SRC"))
-  (add-to-list 'org-structure-template-alist
-               '("html" "#+BEGIN_SRC html\n?\n#+END_SRC"))
-  (add-to-list 'org-structure-template-alist
-               '("css" "#+BEGIN_SRC css\n?\n#+END_SRC"))
-#+END_SRC
-
-Org tempo can also be used.
-
+** Structured templates
 #+BEGIN_SRC emacs-lisp
 (require 'org-tempo)
 (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
@@ -497,14 +530,46 @@ Org tempo can also be used.
 (add-to-list 'org-structure-template-alist '("py" . "src python"))
 #+END_SRC
 
-** Gen config
-*** Src edit window no split
+#+begin_src emacs-lisp
+(setq org-use-speed-commands t)
+#+end_src
+** Src edit window no split
 Do not split while editing ~src~ with ~C-c '~
 #+BEGIN_SRC emacs-lisp :tangle no
   (setq org-src-window-setup 'current-window)
 #+END_SRC
+** Task Workflow
+Each task that is to be done is assigned =TODO=
+The task which is being worked on is assigned =TODO=
+The task which was started, but is on hold due to oter task being worked on, or waiting for something else is assigned =IDLE=
+Finished task is marked as =DONE=
+Task decided not to do or delegated is assigned =NOPE=
+#+begin_src emacs-lisp
+(setq org-todo-keywords
+      '((sequence "TODO" "WIP" "IDLE" "|" "DONE" "NOPE")))
+#+end_src
 
+Whenever a task is switched from =TODO= to =WIP=, clock in.
+Whenever a task is switched from =WIP= to =IDLE=, clock out.
+Org-mode will auto clock out when switching to a done state.
 
+#+begin_src emacs-lisp
+(defun rambo/org-clock-in ()
+  "Clock in an Org mode task when the status is changed to 'WIP'."
+  (when (and (eq major-mode 'org-mode)
+             (member (or (org-get-todo-state) "") '("WIP")))
+    (org-clock-in)))
+
+(defun rambo/org-clock-out ()
+  "Clock out an Org mode task when the status is changed to 'IDLE'."
+  (when (and (eq major-mode 'org-mode)
+             (member (or (org-get-todo-state) "") '("IDLE")))
+    (org-clock-out)))
+
+(add-hook 'org-after-todo-state-change-hook #'rambo/org-clock-in)
+(add-hook 'org-after-todo-state-change-hook #'rambo/org-clock-out)
+
+#+end_src
 ** Emoji in org buffer
 To make org documents more beautiful, add support for emoji with =emojify= package.
 #+BEGIN_SRC emacs-lisp
@@ -513,7 +578,7 @@ To make org documents more beautiful, add support for emoji with =emojify= packa
   :commands emojify-mode)
 #+END_SRC
 ** Org-roam
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (use-package org-roam
   :ensure t
   :custom
@@ -801,6 +866,10 @@ This mode helps design IDE for different programming interfaces.
 
 ** Python lsp 
 #+BEGIN_SRC emacs-lisp
+(use-package pyenv-mode
+  :hook (python-mode . pyenv-mode)
+)
+
 (use-package python-mode
   :ensure t
   :hook (python-mode . lsp-deferred)
@@ -830,8 +899,8 @@ This mode helps design IDE for different programming interfaces.
 #+begin_src emacs-lisp
 (use-package flycheck
   :ensure t
-  :init (global-flycheck-mode))
-#+end_src>
+  :hook (python-mode . flycheck-mode))
+#+end_src
 ** Treesitter
 #+begin_src emacs-lisp
 (use-package tree-sitter
