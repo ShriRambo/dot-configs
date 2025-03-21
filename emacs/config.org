@@ -256,6 +256,11 @@ Closing matching brackets and quotes.
 (add-hook 'prog-mode-hook 'electric-pair-mode)
 #+END_SRC
 
+** No More Tabs
+
+#+begin_src emacs-lisp
+(setq-default indent-tabs-mode nil)
+#+end_src
 ** Hungry delete 
 To remove all lagging spaces all at once
 #+BEGIN_SRC emacs-lisp
@@ -366,7 +371,7 @@ Using nerd-icons in dired
 #+begin_src emacs-lisp
 (use-package org
   :pin elpa)
-(require 'org-mode)
+(require 'org)
 #+end_src
 ** Org Capture
 Location where all captured notes will go. All the org roam files are also in the same folder
@@ -374,39 +379,40 @@ Location where all captured notes will go. All the org roam files are also in th
 (setq org-default-notes-file  "~/notes/inbox.org")
 #+end_src
 
-Template for Meetings
+Template for meetings.
 #+begin_src emacs-lisp
 (defun rambo/org-capture-template-meeting ()
   "Generate a dynamic Org capture template string."
-  (concat "*  %?\n"
-      ":PROPERTIES:\n"
-      ":CREATED: %u\n"
-      ":SCHEDULED: %^{Scheduled date}t\n"
-      ":END:\n\n"))
+   '"* TODO %?\n SCHEDULED: %^{Scheduled date}T\n")
 #+end_src
 
-Template for Tasks to be done Today
+Template for Tasks to be done today.
 #+begin_src emacs-lisp
 (defun rambo/org-capture-template-todo-today ()
   "Generate a dynamic Org capture template string."
-  (concat "* TODO %?\n"
-      ":PROPERTIES:\n"
-      ":CREATED: %u\n"
-      ":SCHEDULED: %t\n"
-      ":END:\n\n"))
+  '"* TODO %?\n SCHEDULED: %t\n")
 #+end_src
 
-Template for Tasks to be done Today
+Template for Tasks to be done now.
 #+begin_src emacs-lisp
 (defun rambo/org-capture-template-todo-now ()
   "Generate a dynamic Org capture template string."
-  (concat "* WIP %?\n"
-      ":PROPERTIES:\n"
-      ":CREATED: %u\n"
-      ":SCHEDULED: %t\n"
-      ":END:\n\n"))
+  '"* WIP %?    :adhoc:\n SCHEDULED: %t\n")
 #+end_src
 
+Template for Tasks to be done later, with a scheduled dte.
+#+begin_src emacs-lisp
+(defun rambo/org-capture-template-todo-later ()
+  "Generate a dynamic Org capture template string."
+  '"* TODO %?\n SCHEDULED: %^{Scheduled date}t\n")
+#+end_src
+
+Template for Tasks with a deadline.
+#+begin_src emacs-lisp
+(defun rambo/org-capture-template-todo-deadline ()
+  "Generate a dynamic Org capture template string."
+  '"* TODO %?\n DEADLINE: %^{Deadline}t\n")
+#+end_src
 
 Create capture templates:
 #+begin_src emacs-lisp
@@ -414,28 +420,34 @@ Create capture templates:
       `(("m" "Meeting or Appointment" entry 
           (file+olp "~/notes/meetings.org" ,(format-time-string "%Y") ,(format-time-string "%B")) 
           (function rambo/org-capture-template-meeting))
-        ("tt" "Todo Today" entry
+        ("tt" "Task for today" entry
           (file+olp+datetree "~/notes/tasks.org" "Things to do Today")
           (function rambo/org-capture-template-todo-today))
-        ("tn" "Todo Now" entry
+        ("ts" "Task for someday" entry
+          (file+olp+datetree "~/notes/tasks.org" "Things for Later")
+          (function rambo/org-capture-template-todo-later))
+        ("ts" "Task with deadline" entry
+          (file+olp+datetree "~/notes/tasks.org" "Things for Later")
+          (function rambo/org-capture-template-todo-deadline))
+        ("tn" "Task for now" entry
           (file+olp+datetree "~/notes/tasks.org" "Things to do Today")
           (function rambo/org-capture-template-todo-now) :prepend t :clock-in t :clock-keep nil :jump-to-captured t )))
 #+end_src
 
-** Agenda
+** Org Agenda
+Only gather agenda entries from meetings and tasks.
 #+begin_src emacs-lisp
-(setq org-agenda-files '("~/notes/"))
+(setq org-agenda-files '("~/notes/meetings.org" "~/notes/tasks.org"))
 #+end_src
+
 ** Org bable
 + Org bable load languages
  #+BEGIN_SRC emacs-lisp
    (org-babel-do-load-languages
     'org-babel-load-languages
-    '(
-      (python . t)
+    '((python . t)
       (shell . t)
-      (js . t)
-      ))
+      (js . t)))
  #+END_SRC
 
 +  Org bable no confirmation for following languages
@@ -464,7 +476,9 @@ Log a timestamp when a TODO is changed to DONE state
 
 And log it to a drawer
 #+BEGIN_SRC emacs-lisp
+(setq org-log-done t)
 (setq org-log-into-drawer t)
+ (setq org-log-state-into-drawer t)
 #+END_SRC
 
 ** Org Bullets
@@ -528,6 +542,9 @@ These are having some issues with toto font size being too small so check it out
 (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 (add-to-list 'org-structure-template-alist '("py" . "src python"))
+(add-to-list 'org-structure-template-alist '("js" . "src javascript"))
+(add-to-list 'org-structure-template-alist '("css" . "src css"))
+(add-to-list 'org-structure-template-alist '("html" . "src html"))
 #+END_SRC
 
 #+begin_src emacs-lisp
@@ -549,6 +566,14 @@ Task decided not to do or delegated is assigned =NOPE=
       '((sequence "TODO" "WIP" "IDLE" "|" "DONE" "NOPE")))
 #+end_src
 
+Colors for TODO keywords
+
+#+begin_src emacs-lisp
+(setq org-todo-keyword-faces
+      '(("WIP" . (:foreground "red" :weight bold))
+        ("IDLE" . (:foreground "gold" :weight bold))))
+#+end_src
+
 Whenever a task is switched from =TODO= to =WIP=, clock in.
 Whenever a task is switched from =WIP= to =IDLE=, clock out.
 Org-mode will auto clock out when switching to a done state.
@@ -557,18 +582,39 @@ Org-mode will auto clock out when switching to a done state.
 (defun rambo/org-clock-in ()
   "Clock in an Org mode task when the status is changed to 'WIP'."
   (when (and (eq major-mode 'org-mode)
+             (not (org-clocking-p))
              (member (or (org-get-todo-state) "") '("WIP")))
     (org-clock-in)))
 
 (defun rambo/org-clock-out ()
   "Clock out an Org mode task when the status is changed to 'IDLE'."
   (when (and (eq major-mode 'org-mode)
+             (org-clocking-p)
              (member (or (org-get-todo-state) "") '("IDLE")))
     (org-clock-out)))
 
+(defun rambo/org-clock-out-on-exit ()
+  "Clock out if there is an active clock before Emacs exits."
+  (ignore-errors (when (org-clocking-p)  ;; Check if a task is currently clocked in
+    (org-clock-out))))     ;; Clock it out. If errors, ignore.
+
+(defun rambo/org-change-todo-wip ()
+  "Change todo state of a task to WIP when clocking in"
+  (when (and (org-clocking-p) 
+             (member (or (org-get-todo-state) "") '("TODO" "IDLE")))
+             (org-todo "WIP")))
+
+(defun rambo/org-change-todo-idle ()
+  "Change todo state of a task from WIP or TODO to IDLE when clocking out"
+   (when (and (not (org-clocking-p))
+              (member (or (org-get-todo-state) "") '("WIP")))
+              (org-todo "IDLE")))
+
+(add-hook 'org-clock-in-hook #'rambo/org-change-todo-wip)
+(add-hook 'org-clock-out-hook #'rambo/org-change-todo-idle)
 (add-hook 'org-after-todo-state-change-hook #'rambo/org-clock-in)
 (add-hook 'org-after-todo-state-change-hook #'rambo/org-clock-out)
-
+(add-hook 'kill-emacs-hook #'rambo/org-clock-out-on-exit)
 #+end_src
 ** Emoji in org buffer
 To make org documents more beautiful, add support for emoji with =emojify= package.
@@ -887,6 +933,9 @@ This mode helps design IDE for different programming interfaces.
 #+begin_src emacs-lisp
 (use-package vue-mode
   :defer t )
+
+; Use 4  space as indent for Vue-html
+(setq-default sgml-basic-offset 4)
 #+end_src
 
 ** Dockerfile
@@ -927,7 +976,7 @@ This mode helps design IDE for different programming interfaces.
 ** TODO Configure pyvenv
 ** TODO Desktop session save
 Check ~desktop save mode~
-* 🗃 Archives
+* 🗃  Archives
 The configuration wihich is not in use anymore
 ** Ivy switch buffer improvement
 #+BEGIN_SRC emacs-lisp :tangle no
@@ -956,7 +1005,7 @@ The configuration wihich is not in use anymore
       :ensure t
       :bind ("M-x" . counsel-M-x))
 
-      :config ((setq counsel-describe-function-function #'helpful-callable)
+      (:config ((setq counsel-describe-function-function #'helpful-callable)
               (setq counsel-describe-variable-function #'helpful-variable)))
 #+END_SRC
 * Desktop save mode
@@ -968,10 +1017,23 @@ The configuration wihich is not in use anymore
 (add-hook 'after-init-hook 'rambo/desktop-save-mode)
 #+end_src
 * 👾 Apply changes
+When working on config, invalid config can be pushed. Which makes it difficult to fix.
+First make a backup of existing file
+#+begin_src shell :results none
+cp ~/.emacs.d/config.org ~/.emacs.d/config.org.bkp
+#+end_src
+
 Copy the file to the required location
-Go to the code below and press ~C-c~ and then confirm yes
-#+BEGIN_SRC shell :results none
-  cp config.org ~/.emacs.d/config.org
-#+END_SRC
+#+begin_src shell :results none
+cp config.org ~/.emacs.d/config.org
+#+end_src
 
 And reload the emacs config
+#+begin_src emacs-lisp :tangle no :results none
+(load user-init-file)
+#+end_src
+
+If doesn't work out, restorey from the backup
+#+begin_src shell :results none
+cp ~/.emacs.d/config.org.bkp ~/.emacs.d/config.org
+#+end_src
