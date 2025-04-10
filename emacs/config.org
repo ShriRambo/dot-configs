@@ -383,35 +383,35 @@ Template for meetings.
 #+begin_src emacs-lisp
 (defun rambo/org-capture-template-meeting ()
   "Generate a dynamic Org capture template string."
-   '"* TODO %?\n SCHEDULED: %^{Scheduled date}T\n")
+   '"* TODO %?\nSCHEDULED: %^{Scheduled date}T\n")
 #+end_src
 
 Template for Tasks to be done today.
 #+begin_src emacs-lisp
 (defun rambo/org-capture-template-todo-today ()
   "Generate a dynamic Org capture template string."
-  '"* TODO %?\n SCHEDULED: %t\n")
+  '"* TODO %?\nSCHEDULED: %t\n")
 #+end_src
 
 Template for Tasks to be done now.
 #+begin_src emacs-lisp
 (defun rambo/org-capture-template-todo-now ()
   "Generate a dynamic Org capture template string."
-  '"* WIP %?    :adhoc:\n SCHEDULED: %t\n")
+  '"* WIP %?    :adhoc:\nSCHEDULED: %t\n")
 #+end_src
 
 Template for Tasks to be done later, with a scheduled dte.
 #+begin_src emacs-lisp
 (defun rambo/org-capture-template-todo-later ()
   "Generate a dynamic Org capture template string."
-  '"* TODO %?\n SCHEDULED: %^{Scheduled date}t\n")
+  '"* TODO %?\nSCHEDULED: %^{Scheduled date}t\n")
 #+end_src
 
 Template for Tasks with a deadline.
 #+begin_src emacs-lisp
 (defun rambo/org-capture-template-todo-deadline ()
   "Generate a dynamic Org capture template string."
-  '"* TODO %?\n DEADLINE: %^{Deadline}t\n")
+  '"* TODO %?\nDEADLINE: %^{Deadline}t\n")
 #+end_src
 
 Create capture templates:
@@ -438,6 +438,18 @@ Create capture templates:
 Only gather agenda entries from meetings and tasks.
 #+begin_src emacs-lisp
 (setq org-agenda-files '("~/notes/meetings.org" "~/notes/tasks.org"))
+
+; To solve the problem of tags being displayed out of window.
+(setq org-agenda-align-tags-to-column (- (floor (* 0.6 (frame-width))) 5))
+;; This is Chat-GPT solution, not the best. Please find a better one.
+#+end_src
+
+** Open links in chrome when using in WSL
+
+#+begin_src emacs-lisp
+; TODO: Check if system is WSL
+(setq browse-url-generic-program "/mnt/c/Program Files/Google/Chrome/Application/chrome.exe"
+      browse-url-browser-function 'browse-url-generic)
 #+end_src
 
 ** Org bable
@@ -545,6 +557,8 @@ These are having some issues with toto font size being too small so check it out
 (add-to-list 'org-structure-template-alist '("js" . "src javascript"))
 (add-to-list 'org-structure-template-alist '("css" . "src css"))
 (add-to-list 'org-structure-template-alist '("html" . "src html"))
+(add-to-list 'org-structure-template-alist '("json" . "src json"))
+(add-to-list 'org-structure-template-alist '("yml" . "src yaml"))
 #+END_SRC
 
 #+begin_src emacs-lisp
@@ -623,7 +637,29 @@ To make org documents more beautiful, add support for emoji with =emojify= packa
   :hook (org-mode . emojify-mode)
   :commands emojify-mode)
 #+END_SRC
-** Org-roam
+** Links
+
+Example ticket [[jira:IT-1321]] and bitbucket repo [[bibu:streaming-transforms/src/master]]
+
+#+begin_src emacs-lisp
+(org-link-set-parameters "jira"
+    ;; When you click on such links, take you to jira ticket
+    :follow (lambda (label) (browse-url (concat "https://northpool.atlassian.net/browse/" label)))
+   ;:display 'full
+   ;; Show Jira links in green
+   :face '(:foreground "green":weight bold :underline t))
+
+(org-link-set-parameters "bibu"
+    ;; When you click on such links, take you to jira ticket
+    :follow (lambda (label) (browse-url (concat "https://bitbucket.org/northpool/" label)))
+   ;:display 'full
+   ;; Show Jira links in green
+   :face '(:foreground "blue":weight bold :underline t))
+#+end_src
+
+
+
+* Org-roam
 #+begin_src emacs-lisp :tangle no
 (use-package org-roam
   :ensure t
