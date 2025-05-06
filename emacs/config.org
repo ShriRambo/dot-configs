@@ -104,6 +104,12 @@ To be able to click-around with mouse
    #+BEGIN_SRC emacs-lisp
    (xterm-mouse-mode t)
    #+END_SRC
+
+**  Smooth scrolling
+Scroll one line at a time, to make it feel like smooth.
+#+begin_src emacs-lisp
+(setq mouse-wheel-scroll-amount '(3 ((shift) . 1) ((control) . nil)))
+#+end_src
 * ⚔ Mode line
 ** Doom modeline
 Description
@@ -275,7 +281,7 @@ Do I really need it?
     :ensure t
     :bind ("s-e" . sudo-edit))
 #+END_SRC
-** Rainbo delimiters
+** Rainbow delimiters
 Only for prog mode?
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
@@ -370,8 +376,9 @@ Using nerd-icons in dired
 ** Pin Org mode
 #+begin_src emacs-lisp
 (use-package org
-  :pin elpa)
-(require 'org)
+  :pin elpa
+  :bind (:map org-mode-map
+  ( "C-c z" . org-toggle-narrow-to-subtree )))
 #+end_src
 ** Org Capture
 Location where all captured notes will go. All the org roam files are also in the same folder
@@ -417,7 +424,7 @@ Template for Tasks with a deadline.
 Create capture templates:
 #+begin_src emacs-lisp
 (setq org-capture-templates
-      `(("m" "Meeting or Appointment" entry 
+      `(("ma" "Meeting or Appointment" entry 
           (file+olp "~/notes/meetings.org" ,(format-time-string "%Y") ,(format-time-string "%B")) 
           (function rambo/org-capture-template-meeting))
         ("tt" "Task for today" entry
@@ -426,7 +433,7 @@ Create capture templates:
         ("ts" "Task for someday" entry
           (file+olp+datetree "~/notes/tasks.org" "Things for Later")
           (function rambo/org-capture-template-todo-later))
-        ("ts" "Task with deadline" entry
+        ("td" "Task with deadline" entry
           (file+olp+datetree "~/notes/tasks.org" "Things for Later")
           (function rambo/org-capture-template-todo-deadline))
         ("tn" "Task for now" entry
@@ -437,9 +444,10 @@ Create capture templates:
 ** Org Agenda
 Only gather agenda entries from meetings and tasks.
 #+begin_src emacs-lisp
+(require 'org)
 (setq org-agenda-files '("~/notes/meetings.org" "~/notes/tasks.org"))
-
 ; To solve the problem of tags being displayed out of window.
+;(setq org-agenda-files '("~/notes/meetings.org" "~/notes/tasks.org"))
 (setq org-agenda-align-tags-to-column (- (floor (* 0.6 (frame-width))) 5))
 ;; This is Chat-GPT solution, not the best. Please find a better one.
 #+end_src
@@ -490,7 +498,7 @@ And log it to a drawer
 #+BEGIN_SRC emacs-lisp
 (setq org-log-done t)
 (setq org-log-into-drawer t)
- (setq org-log-state-into-drawer t)
+(setq org-log-state-into-drawer t)
 #+END_SRC
 
 ** Org Bullets
@@ -639,22 +647,27 @@ To make org documents more beautiful, add support for emoji with =emojify= packa
 #+END_SRC
 ** Links
 
-Example ticket [[jira:IT-1321]] and bitbucket repo [[bibu:streaming-transforms/src/master]]
+Example ticket [[jira:IT-1321]] and bitbucket repo or PR [[bibu:streaming-transforms:88]]
 
 #+begin_src emacs-lisp
 (org-link-set-parameters "jira"
     ;; When you click on such links, take you to jira ticket
     :follow (lambda (label) (browse-url (concat "https://northpool.atlassian.net/browse/" label)))
-   ;:display 'full
-   ;; Show Jira links in green
-   :face '(:foreground "green":weight bold :underline t))
+    ;:display 'full
+    ;; Show Jira links in green
+    :face '(:foreground "green":weight bold :underline t))
 
 (org-link-set-parameters "bibu"
     ;; When you click on such links, take you to jira ticket
-    :follow (lambda (label) (browse-url (concat "https://bitbucket.org/northpool/" label)))
-   ;:display 'full
-   ;; Show Jira links in green
-   :face '(:foreground "blue":weight bold :underline t))
+    :follow (lambda (label)
+                (let* ((parts (split-string label ":"))
+                       (repo (nth 0 parts))
+                       (pr (nth 1 parts))
+                       (path (if pr (concat "/pull-requests/" pr) nil)))
+                (browse-url (concat "https://bitbucket.org/northpool/" repo path))))
+    ;:display 'full
+    ;; Show Jira links in green
+    :face '(:foreground "blue":weight bold :underline t))
 #+end_src
 
 
@@ -770,8 +783,7 @@ This change willnot just split window but also follow to the new window.
              ("C-x f" . counsel-find-file)
              :map minibuffer-local-map
              ("C-r" . 'counsel-minibuffer-history))
-      :config (setq ivy-initial-inputs-alist nil) ;Removes initial ^
-      )
+      :config (setq ivy-initial-inputs-alist nil)) ;Removes initial ^
 #+END_SRC
 ** Ivy rich
 Some helpful transformations for ~Ivy~ and ~Counsel~
