@@ -275,8 +275,8 @@ To remove all lagging spaces all at once
     :ensure t
     :config (global-hungry-delete-mode))
 #+END_SRC
-** Jump sentence for C-n C-p
-#+begin_src emacs-lisp
+** TODO Jump sentence for C-n C-p
+#+begin_src emacs-lisp :tangle no
 (keymap-global-set "C-n" 'forward-sentence)
 (keymap-global-set "C-p" 'backward-sentence)
 ;; Make it mode specific?
@@ -391,7 +391,9 @@ Using nerd-icons in dired
 (use-package org
   :pin elpa
   :bind (:map org-mode-map
-  ( "C-c z" . org-toggle-narrow-to-subtree )))
+  ; Following is not needed. Pressing 's' does the same
+  ;( "C-c z" . org-toggle-narrow-to-subtree )
+))
 #+end_src
 ** Org Crypt
 #+begin_src emacs-lisp
@@ -403,6 +405,8 @@ Using nerd-icons in dired
 ;; nil means  use symmetric encryption unconditionally.
 ;; "" means use symmetric encryption unless heading sets CRYPTKEY property.
 (setq auto-save-default nil)
+;; Prompt for password in minibuffer
+(setq epg-pinentry-mode 'loopback)
 #+end_src
 
 ** Org Capture
@@ -1072,7 +1076,7 @@ This mode helps design IDE for different programming interfaces.
   :ensure t
   :init
   (projectile-mode +1)
-  (setq projectile-project-search-path '("~/Projects/"))
+  (setq projectile-project-search-path '("~/Projects/" "~/projects/"))
   (setq projectile-switch-project-action #'projectile-dired)
   :bind (:map projectile-mode-map
               ("s-p" . projectile-command-map)
