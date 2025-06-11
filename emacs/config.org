@@ -260,6 +260,7 @@ Instead of typing full *yes* or *no*, we just write *y* or *n*. Save some time f
 Closing matching brackets and quotes.
 #+BEGIN_SRC emacs-lisp
 (add-hook 'prog-mode-hook 'electric-pair-mode)
+(add-hook 'prog-mode-hook 'hs-minor-mode)
 #+END_SRC
 
 ** No More Tabs
@@ -274,6 +275,18 @@ To remove all lagging spaces all at once
     :ensure t
     :config (global-hungry-delete-mode))
 #+END_SRC
+** Jump sentence for C-n C-p
+#+begin_src emacs-lisp
+(keymap-global-set "C-n" 'forward-sentence)
+(keymap-global-set "C-p" 'backward-sentence)
+;; Make it mode specific?
+;(defun rambo/jump-sentences ()
+ ; "Custom keybindings for programming modes."
+ ; (local-set-key (kbd "C-p") 'backward-sentence)
+ ; (local-set-key (kbd "C-n") 'forward-sentence))
+
+;(add-hook 'prog-mode-hook #'rambo/jump-sentences)
+#+end_src
 ** Sudo edit
 Do I really need it?
 #+BEGIN_SRC emacs-lisp :tangle no
@@ -444,12 +457,9 @@ Create capture templates:
 ** Org Agenda
 Only gather agenda entries from meetings and tasks.
 #+begin_src emacs-lisp
-(require 'org)
 (setq org-agenda-files '("~/notes/meetings.org" "~/notes/tasks.org"))
 ; To solve the problem of tags being displayed out of window.
-;(setq org-agenda-files '("~/notes/meetings.org" "~/notes/tasks.org"))
-(setq org-agenda-align-tags-to-column (- (floor (* 0.6 (frame-width))) 5))
-;; This is Chat-GPT solution, not the best. Please find a better one.
+(setq org-agenda-align-tags-to-column 150)
 #+end_src
 
 ** Open links in chrome when using in WSL
@@ -671,19 +681,25 @@ Example ticket [[jira:IT-1321]] and bitbucket repo or PR [[bibu:streaming-transf
 #+end_src
 
 
+** Tags
 
+Sort tags alphabetically
+#+begin_src emacs-lisp
+(setq org-tags-sort-function 'string-collate-lessp)
+#+end_src
 * Org-roam
 #+begin_src emacs-lisp :tangle no
 (use-package org-roam
   :ensure t
-  :custom
+  :require org
   (org-roam-directory "~/notes/roam")
   :bind (("C-c n l" . org-roam-buffer-toggle)
-	 ("C-c n f" . org-roam-node-find)
-	 ("C-c n i" . org-roam-node-insert))
-         :config (org-roam-setup))
+          ("C-c n f" . org-roam-node-find)
+	    ("C-c n i" . org-roam-node-insert))
+  :config (org-roam-setup))
 #+end_src
 * 🚶🏽 Moving around
+** TODO Jump n lines up and down and use relative linum
 ** Ido
 I do this and I do that
 ~C-x C-f~ for using IDO to find file
@@ -783,7 +799,9 @@ This change willnot just split window but also follow to the new window.
              ("C-x f" . counsel-find-file)
              :map minibuffer-local-map
              ("C-r" . 'counsel-minibuffer-history))
-      :config (setq ivy-initial-inputs-alist nil)) ;Removes initial ^
+      :config 
+             (setq ivy-initial-inputs-alist nil)  ;Removes initial ^
+             (setq imenu-flatten t))
 #+END_SRC
 ** Ivy rich
 Some helpful transformations for ~Ivy~ and ~Counsel~
@@ -997,6 +1015,7 @@ This mode helps design IDE for different programming interfaces.
 (use-package flycheck
   :ensure t
   :hook (python-mode . flycheck-mode))
+(setq flycheck-check-syntax-automatically '(save mode-enable))
 #+end_src
 ** Treesitter
 #+begin_src emacs-lisp
