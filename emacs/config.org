@@ -26,7 +26,7 @@ Adding melpa package repository and initialize
 
 #+begin_src emacs-lisp
 (require 'package)
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+(setq package-archives '( ;("melpa" . "https://melpa.org/packages/")
                          ("melpa-stable" . "https://stable.melpa.org/packages/")
                          ("elpa" . "https://elpa.gnu.org/packages/")))
 
@@ -393,6 +393,18 @@ Using nerd-icons in dired
   :bind (:map org-mode-map
   ( "C-c z" . org-toggle-narrow-to-subtree )))
 #+end_src
+** Org Crypt
+#+begin_src emacs-lisp
+(require 'org-crypt)
+(org-crypt-use-before-save-magic)
+(setq org-tags-exclude-from-inheritance '("crypt"))
+(setq org-crypt-key nil)
+;; GPG key to use for encryption.
+;; nil means  use symmetric encryption unconditionally.
+;; "" means use symmetric encryption unless heading sets CRYPTKEY property.
+(setq auto-save-default nil)
+#+end_src
+
 ** Org Capture
 Location where all captured notes will go. All the org roam files are also in the same folder
 #+begin_src emacs-lisp :tangle no
@@ -434,6 +446,20 @@ Template for Tasks with a deadline.
   '"* TODO %?\nDEADLINE: %^{Deadline}t\n")
 #+end_src
 
+Template for House
+#+begin_src emacs-lisp
+(defun rambo/org-capture-template-house-koop ()
+  "Generate template string for house"
+  (concat "* TOVIEW %?\n"
+      ":PROPERTIES:\n"
+      ":COST: %?K\n"
+      ":AREA: %?m2\n"
+      ":ENERGYLABEL: %?\n"
+      ":BUURT: %?\n"
+      ":LINK: [[%?][funda]]\n"
+      ":END:"))
+#+end_src
+
 Create capture templates:
 #+begin_src emacs-lisp
 (setq org-capture-templates
@@ -451,7 +477,11 @@ Create capture templates:
           (function rambo/org-capture-template-todo-deadline))
         ("tn" "Task for now" entry
           (file+olp+datetree "~/notes/tasks.org" "Things to do Today")
-          (function rambo/org-capture-template-todo-now) :prepend t :clock-in t :clock-keep nil :jump-to-captured t )))
+          (function rambo/org-capture-template-todo-now) :prepend t :clock-in t :clock-keep nil :jump-to-captured t )
+       ("ha" "House hunting" entry
+          (file"~/notes/househunt.org")
+          (function rambo/org-capture-template-house-koop) :prepend t :jump-to-captured t)
+))
 #+end_src
 
 ** Org Agenda
@@ -466,8 +496,11 @@ Only gather agenda entries from meetings and tasks.
 
 #+begin_src emacs-lisp
 ; TODO: Check if system is WSL
-(setq browse-url-generic-program "/mnt/c/Program Files/Google/Chrome/Application/chrome.exe"
-      browse-url-browser-function 'browse-url-generic)
+(if (not (eq system-type 'gnu/linux))
+    (setq browse-url-generic-program "/mnt/c/Program Files/Google/Chrome/Application/chrome.exe"
+    browse-url-browser-function 'browse-url-generic)
+    ; optional else
+)
 #+end_src
 
 ** Org bable
@@ -1039,7 +1072,7 @@ This mode helps design IDE for different programming interfaces.
   :ensure t
   :init
   (projectile-mode +1)
-  (setq projectile-project-search-path '("~/projects/"))
+  (setq projectile-project-search-path '("~/Projects/"))
   (setq projectile-switch-project-action #'projectile-dired)
   :bind (:map projectile-mode-map
               ("s-p" . projectile-command-map)
