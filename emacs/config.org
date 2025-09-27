@@ -105,7 +105,7 @@ To be able to click-around with mouse
    (xterm-mouse-mode t)
    #+END_SRC
 
-**  Smooth scrolling
+** Smooth scrolling
 Scroll one line at a time, to make it feel like smooth.
 #+begin_src emacs-lisp
 (setq mouse-wheel-scroll-amount '(3 ((shift) . 1) ((control) . nil)))
@@ -395,6 +395,7 @@ Using nerd-icons in dired
   ;( "C-c z" . org-toggle-narrow-to-subtree )
 ))
 #+end_src
+
 ** Org Crypt
 #+begin_src emacs-lisp
 (require 'org-crypt)
@@ -499,12 +500,10 @@ Only gather agenda entries from meetings and tasks.
 ** Open links in chrome when using in WSL
 
 #+begin_src emacs-lisp
-; TODO: Check if system is WSL
-(if (not (eq system-type 'gnu/linux))
+; When WSL, it is 6.6.87.1-microsoft-standard-WSL2
+(when (string-match "-[Mm]icrosoft" operating-system-release)
     (setq browse-url-generic-program "/mnt/c/Program Files/Google/Chrome/Application/chrome.exe"
-    browse-url-browser-function 'browse-url-generic)
-    ; optional else
-)
+    browse-url-browser-function 'browse-url-generic))
 #+end_src
 
 ** Org bable
@@ -681,8 +680,8 @@ Org-mode will auto clock out when switching to a done state.
 
 (add-hook 'org-clock-in-hook #'rambo/org-change-todo-wip)
 (add-hook 'org-clock-out-hook #'rambo/org-change-todo-idle)
-(add-hook 'org-after-todo-state-change-hook #'rambo/org-clock-in)
-(add-hook 'org-after-todo-state-change-hook #'rambo/org-clock-out)
+;(add-hook 'org-after-todo-state-change-hook #'rambo/org-clock-in)
+;(add-hook 'org-after-todo-state-change-hook #'rambo/org-clock-out)
 (add-hook 'kill-emacs-hook #'rambo/org-clock-out-on-exit)
 #+end_src
 ** Emoji in org buffer
@@ -716,14 +715,22 @@ Example ticket [[jira:IT-1321]] and bitbucket repo or PR [[bibu:streaming-transf
     ;; Show Jira links in green
     :face '(:foreground "blue":weight bold :underline t))
 #+end_src
-
-
 ** Tags
 
 Sort tags alphabetically
 #+begin_src emacs-lisp
 (setq org-tags-sort-function 'string-collate-lessp)
 #+end_src
+* RSS Feed reader
+** Elfeed
+
+#+begin_src emacs-lisp
+(use-package elfeed
+    :bind
+    ("C-x w" . elfeed)
+)
+#+end_src
+
 * Org-roam
 #+begin_src emacs-lisp :tangle no
 (use-package org-roam
@@ -758,6 +765,7 @@ Seems nice. But this depends on Ido, so keep the Ido section
     :init
     (ido-vertical-mode 1))
 #+END_SRC
+
 ** Ibuffer
 To enter Ibuffer (gives a bit detailed view) 
 #+BEGIN_SRC emacs-lisp 
@@ -800,6 +808,17 @@ This change willnot just split window but also follow to the new window.
     (other-window 1))
   (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
 #+END_SRC
+** Windmove
+Use Shift+Arrow keys to move to other windows
+#+begin_src emacs-lisp
+(use-package windmove
+  :ensure nil
+  :bind*
+  (("C-M-<left>" . windmove-left)
+   ("C-M-<right>" . windmove-right)
+   ("C-M-<up>" . windmove-up)
+   ("C-M-<down>" . windmove-down)))
+#+end_src>
 ** Swiper for search
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
