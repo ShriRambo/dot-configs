@@ -92,13 +92,13 @@ So we can use classic terminal view
   (defun rambo/no-bg-in-term ()
   (unless (display-graphic-p (selected-frame))
   (set-face-background 'default "unspecified-bg" (selected-frame))))
-  
+
   (add-hook 'window-setup-hook 'rambo/no-bg-in-term)
   ;Set org block background to unspec
   (set-face-background 'org-block "unspecified-bg")
    #+END_SRC
-   
-* 🍉 Terminal specific settings 
+
+* 🍉 Terminal specific settings
 ** Enable Xterm-mouse-mode
 To be able to click-around with mouse
    #+BEGIN_SRC emacs-lisp
@@ -221,9 +221,9 @@ Deprecated in favour of ~Treemacs~
 
 (add-hook 'treemacs-mode-hook 'aorst/treemacs-setup-title)
   #+end_src
-  
+
 ** Fancy icons in GUI
-Display fancy icons when in gui 
+Display fancy icons when in gui
 #+BEGIN_SRC emacs-lisp :tangle no
 (when (display-graphic-p)
   (require 'all-the-icons))
@@ -245,7 +245,7 @@ Instead of typing full *yes* or *no*, we just write *y* or *n*. Save some time f
   (setq make-backup-files nil)
   (setq auto-save-default nil)
 #+END_SRC
-** Beacon mode 
+** Beacon mode
 #+BEGIN_SRC emacs-lisp
   (use-package beacon
     :ensure t
@@ -268,7 +268,7 @@ Closing matching brackets and quotes.
 #+begin_src emacs-lisp
 (setq-default indent-tabs-mode nil)
 #+end_src
-** Hungry delete 
+** Hungry delete
 To remove all lagging spaces all at once
 #+BEGIN_SRC emacs-lisp
   (use-package hungry-delete
@@ -311,12 +311,12 @@ Only for prog mode?
 
 ** Pretty characters mode
 This turns common programming keywords and symbol names to actual symbol. While this may be good in some situations, I do not want it enabled by default.
-,#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp :tangle no
   (when window-system
     (use-package pretty-mode
       :ensure t
       :config (global-pretty-mode 1)))
-#+END_SRC 
+#+END_SRC
 ** Open maximised
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
@@ -377,6 +377,10 @@ Turn on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Visual-Line-
 (add-hook 'text-mode-hook 'visual-line-mode)
 (add-hook 'org-mode 'visual-line-mode)
 #+end_src
+** Delete selected text by default
+#+begin_src emacs-lisp
+(delete-selection-mode)
+#+end_src
 
 ** Dired
 Using nerd-icons in dired
@@ -384,6 +388,18 @@ Using nerd-icons in dired
 (use-package nerd-icons-dired
 	:hook
 	(dired-mode . nerd-icons-dired-mode))
+#+end_src
+** Clipetty
+Copy stuff from emacs to windows clipboard
+#+begin_src emacs-lisp
+(use-package clipetty
+  :ensure t
+  :hook (after-init . global-clipetty-mode))
+#+end_src
+** Delete Trailing Whitespaces
+Always remove trailing whitespaces
+#+begin_src emacs-lisp
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+end_src
 * 🦄 Org mode
 ** Pin Org mode
@@ -468,8 +484,8 @@ Template for House
 Create capture templates:
 #+begin_src emacs-lisp
 (setq org-capture-templates
-      `(("ma" "Meeting or Appointment" entry 
-          (file+olp "~/notes/meetings.org" ,(format-time-string "%Y") ,(format-time-string "%B")) 
+      `(("ma" "Meeting or Appointment" entry
+          (file+olp "~/notes/meetings.org" ,(format-time-string "%Y") ,(format-time-string "%B"))
           (function rambo/org-capture-template-meeting))
         ("tt" "Task for today" entry
           (file+olp+datetree "~/notes/tasks.org" "Things to do Today")
@@ -558,7 +574,7 @@ The end of the heading character that will show that the heading is folded
 #+BEGIN_SRC emacs-lisp
   (setq org-ellipsis " ⤵")
 #+END_SRC
-Other interesting characters are ▼ , ↴ , ⬎ , ⤷ , and ⋱ 
+Other interesting characters are ▼ , ↴ , ⬎ , ⤷ , and ⋱
 ** Leading stars and indentation
 #+BEGIN_SRC emacs-lisp
   (setq org-startup-indented t
@@ -568,7 +584,7 @@ Other interesting characters are ▼ , ↴ , ⬎ , ⤷ , and ⋱
 Hide the ~code~, /italics/ and *bold* _underline_ =verbatim= ++strike-through++
 #+BEGIN_SRC emacs-lisp
   (setq org-hide-emphasis-markers nil)
-#+END_SRC 
+#+END_SRC
 ** Pretty symbols
 Show pretty symbols like \lambda instead of \ lambda
 #+BEGIN_SRC emacs-lisp
@@ -668,7 +684,7 @@ Org-mode will auto clock out when switching to a done state.
 
 (defun rambo/org-change-todo-wip ()
   "Change todo state of a task to WIP when clocking in"
-  (when (and (org-clocking-p) 
+  (when (and (org-clocking-p)
              (member (or (org-get-todo-state) "") '("TODO" "IDLE")))
              (org-todo "WIP")))
 
@@ -726,9 +742,8 @@ Sort tags alphabetically
 
 #+begin_src emacs-lisp
 (use-package elfeed
-    :bind
-    ("C-x w" . elfeed)
-)
+:bind
+("C-x w" . elfeed))
 #+end_src
 
 * Org-roam
@@ -767,8 +782,8 @@ Seems nice. But this depends on Ido, so keep the Ido section
 #+END_SRC
 
 ** Ibuffer
-To enter Ibuffer (gives a bit detailed view) 
-#+BEGIN_SRC emacs-lisp 
+To enter Ibuffer (gives a bit detailed view)
+#+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x C-b") 'ibuffer)
 #+END_SRC
 ** Smex
@@ -813,12 +828,12 @@ Use Shift+Arrow keys to move to other windows
 #+begin_src emacs-lisp
 (use-package windmove
   :ensure nil
-  :bind*
+  :bind
   (("C-M-<left>" . windmove-left)
    ("C-M-<right>" . windmove-right)
    ("C-M-<up>" . windmove-up)
    ("C-M-<down>" . windmove-down)))
-#+end_src>
+#+end_src
 ** Swiper for search
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
@@ -831,7 +846,7 @@ Use Shift+Arrow keys to move to other windows
       :diminish
       :bind (("C-x b" . ivy-switch-buffer)
              :map ivy-minibuffer-map
-             ("TAB" . ivy-alt-done)	
+             ("TAB" . ivy-alt-done)
              ("C-l" . ivy-alt-done)
              ("C-j" . ivy-next-line)
              ("C-k" . ivy-previous-line)
@@ -847,7 +862,7 @@ Use Shift+Arrow keys to move to other windows
       (ivy-mode 1))
 #+END_SRC
 ** Counsel for minibuffer help comes with ivy
-#+BEGIN_SRC emacs-lisp 
+#+BEGIN_SRC emacs-lisp
   (use-package counsel
       :ensure t
       :bind (("M-x" . counsel-M-x)
@@ -855,7 +870,7 @@ Use Shift+Arrow keys to move to other windows
              ("C-x f" . counsel-find-file)
              :map minibuffer-local-map
              ("C-r" . 'counsel-minibuffer-history))
-      :config 
+      :config
              (setq ivy-initial-inputs-alist nil)  ;Removes initial ^
              (setq imenu-flatten t))
 #+END_SRC
@@ -888,7 +903,7 @@ Some helpful transformations for ~Ivy~ and ~Counsel~
      :custom
      (counsel-describe-function-function #'helpful-callable)
      (counsel-describe-variable-function #'helpful-variable)
-     :bind 
+     :bind
      ([remap describe-function] .  counsel-describe-function)
      ([remap describe-symbol]  . helpful-symbol)
      ([remap describe-variable] . counsel-describe-variable)
@@ -966,7 +981,7 @@ When in GUI mode use, use bitmaps for git gutter.
     (interactive)
     (backward-word)
     (kill-word 1))
-  (global-set-key (kbd "M-d") 'kill-whole-word)	     
+  (global-set-key (kbd "M-d") 'kill-whole-word)
 #+END_SRC
 
 * 🧬 lsp-mode
@@ -1032,7 +1047,7 @@ This mode helps design IDE for different programming interfaces.
 ** Additional keybindings
 *** TODO Keybinding for comment-or-uncomment
 
-** Python lsp 
+** Python lsp
 #+BEGIN_SRC emacs-lisp
 (use-package pyenv-mode
   :hook (python-mode . pyenv-mode)
@@ -1121,7 +1136,7 @@ The configuration wihich is not in use anymore
     :diminish
     :bind (("C-x b" . ivy-switch-buffer)
            :map ivy-minibuffer-map
-           ("TAB" . ivy-alt-done)	
+           ("TAB" . ivy-alt-done)
            ("C-l" . ivy-alt-done)
            ("C-j" . ivy-next-line)
            ("C-k" . ivy-previous-line)
