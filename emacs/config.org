@@ -26,12 +26,15 @@ Adding melpa package repository and initialize
 
 #+begin_src emacs-lisp
 (require 'package)
-(setq package-archives '( ;("melpa" . "https://melpa.org/packages/")
-                         ("melpa-stable" . "https://stable.melpa.org/packages/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
+(setq package-archives '(("melpa-stable" . "https://stable.melpa.org/packages/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")
+                         ;("melpa" . "https://melpa.org/packages/")
+))
 
 (package-initialize)
 #+end_src
+
+#+RESULTS:
 
 Note that you'll need to run ~M-x package-refresh-contents~ or ~M-x package-list-packages~ to ensure that Emacs has fetched the MELPA package list before you can install packages with M-x package-install or similar. Following does that automatically
 
@@ -49,14 +52,6 @@ This downloads ~use-package~ package if not installed.
 #+end_src
 
 * 🎨 Theme
-** VSCode dark theme
- #+BEGIN_SRC emacs-lisp :tangle no
- (use-package vscode-dark-plus-theme
-   :ensure t
-   :config
-   (load-theme 'vscode-dark-plus t))
- #+END_SRC
-
 ** Doom theme
 #+BEGIN_SRC emacs-lisp
   (use-package doom-themes
@@ -77,13 +72,6 @@ This downloads ~use-package~ package if not installed.
     ;; Corrects (and improves) org-mode's native fontification.
     (doom-themes-org-config))
 #+END_SRC
-
-** Zenburn theme
- #+BEGIN_SRC emacs-lisp :tangle no
- (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
- (load-theme 'zenburn-theme t)
- #+END_SRC
-
 ** No background in terminal mode
 Do not use theme background in terminal mode
 So we can use classic terminal view
@@ -116,111 +104,18 @@ Description
 #+BEGIN_SRC emacs-lisp
 (use-package doom-modeline
   :ensure t
-  :hook (after-init . doom-modeline-mode))
-
-(setq doom-modeline-vcs-max-length 30)
+  :hook
+  (after-init . doom-modeline-mode)
+  :config
+  (setq doom-modeline-vcs-max-length 30))
 #+END_SRC
+
 * 🦠 Basic UX settings
 ** Startup screen
 Disable splash screen
 #+BEGIN_SRC emacs-lisp
 (setq inhibit-splash-screen 0)
 #+END_SRC
-** Neo tree side buffer
-Using neotree to show current dir (Don't know how to use dired)
-First config command adds neotree to startup hook so that it loads on startup
-Second config command adds multiline mode to neotree so that long file names are shown by textwrap
-#+BEGIN_SRC emacs-lisp :tangle no
-(use-package neotree
-   :ensure t
-   :config
-   ; Load neotree on startup
-   ;(add-hook 'emacs-startup-hook 'neotree)
-   ; Visual line mode on neotree biffer
-   (add-hook 'neotree-mode-hook 'visual-line-mode)
-   :bind
-   ("C-a" . neotree-toggle))
-#+END_SRC
-Deprecated in favour of ~Treemacs~
-** [[https://github.com/Alexander-Miller/treemacs][Treemacs]]
-
-#+begin_src emacs-lisp
-(use-package treemacs
-  :ensure t
-  :defer t
-  :config
-  (progn
-    (setq treemacs-width                           25
-          treemacs-width-is-initially-locked       nil)
-
-    ;; The default width and height of the icons is 22 pixels. If you are
-    ;; using a Hi-DPI display, uncomment this to double the icon size.
-    ;;(treemacs-resize-icons 44)
-
-    (treemacs-follow-mode t)
-    (treemacs-indent-guide-mode t)
-    (treemacs-filewatch-mode t)
-    (treemacs-fringe-indicator-mode 'always)
-    (when treemacs-python-executable
-      (treemacs-git-commit-diff-mode t))
-
-    (pcase (cons (not (null (executable-find "git")))
-                 (not (null treemacs-python-executable)))
-      (`(t . t)
-       (treemacs-git-mode 'deferred))
-      (`(t . _)
-       (treemacs-git-mode 'simple)))
-
-    (treemacs-hide-gitignored-files-mode nil))
-  :bind
-  (:map global-map
-        ("M-0"       . treemacs-select-window)
-        ("C-x t 1"   . treemacs-delete-other-windows)
-        ("C-a"   . treemacs)
-        ("C-x t d"   . treemacs-select-directory)
-        ("C-x t B"   . treemacs-bookmark)
-        ("C-x t C-t" . treemacs-find-file)
-        ("C-x t M-t" . treemacs-find-tag)))
-
-; Oher additions for treemacs
-(use-package treemacs-projectile
-  :after (treemacs projectile)
-  :ensure t)
-
-(use-package treemacs-icons-dired
-  :hook (dired-mode . treemacs-icons-dired-enable-once)
-  :ensure t)
-
-(use-package treemacs-magit
-  :after (treemacs magit)
-  :ensure t)
-
-(use-package treemacs-tab-bar ;;treemacs-tab-bar if you use tab-bar-mode
-  :after (treemacs)
-  :ensure t
-  :config (treemacs-set-scope-type 'Tabs))
-
-; Nerd icons for treemacs
-(use-package treemacs-nerd-icons
-  :config
-  (treemacs-load-theme "nerd-icons"))
-
-
-(defun aorst/treemacs-setup-title ()
-  (let ((bg (face-attribute 'default :background))
-        (fg (face-attribute 'default :foreground)))
-    (face-remap-add-relative 'header-line
-                             :background bg :foreground fg
-                             :box `(:line-width ,(/ (line-pixel-height) 2) :color ,bg)))
-  (setq header-line-format
-        '((:eval
-           (let* ((text (treemacs-workspace->name (treemacs-current-workspace)))
-                  (extra-align (+ (/ (length text) 2) 1))
-                  (width (- (/ (window-width) 2) extra-align)))
-             (concat (make-string width ?\s) text))))))
-
-(add-hook 'treemacs-mode-hook 'aorst/treemacs-setup-title)
-  #+end_src
 
 ** Fancy icons in GUI
 Display fancy icons when in gui
@@ -230,20 +125,22 @@ Display fancy icons when in gui
 #+END_SRC
 ** Which key
 #+BEGIN_SRC emacs-lisp
-  (use-package which-key
-     :ensure t
-     :init (which-key-mode)
-     :config (setq which-key-idle-delay 0.7))
+(use-package which-key
+  :ensure t
+  :init (which-key-mode)
+  :config
+  (setq which-key-idle-delay 0.7)
+  (which-key-setup-side-window-right-bottom))
 #+END_SRC
 ** Yes or No to y or n
 Instead of typing full *yes* or *no*, we just write *y* or *n*. Save some time for your girl.
 #+BEGIN_SRC emacs-lisp
-  (defalias 'yes-or-no-p 'y-or-n-p)
+(defalias 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 ** No saving backups. We don't need them :D
 #+BEGIN_SRC emacs-lisp
-  (setq make-backup-files nil)
-  (setq auto-save-default nil)
+(setq make-backup-files nil)
+(setq auto-save-default nil)
 #+END_SRC
 ** Beacon mode
 #+BEGIN_SRC emacs-lisp
@@ -254,13 +151,18 @@ Instead of typing full *yes* or *no*, we just write *y* or *n*. Save some time f
 #+END_SRC
 ** Camel Case (Make it only for prog mode)
 #+BEGIN_SRC emacs-lisp
-  (global-subword-mode 1)
+(global-subword-mode 1)
 #+END_SRC
 ** Electric pairs
 Closing matching brackets and quotes.
 #+BEGIN_SRC emacs-lisp
 (add-hook 'prog-mode-hook 'electric-pair-mode)
 (add-hook 'prog-mode-hook 'hs-minor-mode)
+; Not to use electric pair for < in org mode as it is used by org-tempo
+(add-hook 'org-mode-hook (lambda ()
+           (setq-local electric-pair-inhibit-predicate
+                   `(lambda (c)
+                  (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
 #+END_SRC
 
 ** No More Tabs
@@ -271,36 +173,23 @@ Closing matching brackets and quotes.
 ** Hungry delete
 To remove all lagging spaces all at once
 #+BEGIN_SRC emacs-lisp
-  (use-package hungry-delete
+(use-package hungry-delete
     :ensure t
     :config (global-hungry-delete-mode))
 #+END_SRC
-** TODO Jump sentence for C-n C-p
-#+begin_src emacs-lisp :tangle no
-(keymap-global-set "C-n" 'forward-sentence)
-(keymap-global-set "C-p" 'backward-sentence)
-;; Make it mode specific?
-;(defun rambo/jump-sentences ()
- ; "Custom keybindings for programming modes."
- ; (local-set-key (kbd "C-p") 'backward-sentence)
- ; (local-set-key (kbd "C-n") 'forward-sentence))
-
-;(add-hook 'prog-mode-hook #'rambo/jump-sentences)
+** TODO Move text
+Something is not right
+#+begin_src emacs-lisp
+(use-package move-text
+  :config
+  (move-text-default-bindings))
 #+end_src
-** Sudo edit
-Do I really need it?
-#+BEGIN_SRC emacs-lisp :tangle no
-  (use-package sudo-edit
-    :ensure t
-    :bind ("s-e" . sudo-edit))
-#+END_SRC
 ** Rainbow delimiters
 Only for prog mode?
 #+BEGIN_SRC emacs-lisp
-  (use-package rainbow-delimiters
-    :ensure t
-    :hook ((prog-mode . rainbow-delimiters-mode)))
-          ; (org-mode . rainbow-delimiters-mode)))
+(use-package rainbow-delimiters
+  :ensure t
+  :hook ((prog-mode . rainbow-delimiters-mode)))
 #+END_SRC
 ** Fancy killring
 #+BEGIN_SRC emacs-lisp
@@ -319,13 +208,13 @@ This turns common programming keywords and symbol names to actual symbol. While 
 #+END_SRC
 ** Open maximised
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-  (add-to-list 'default-frame-alist '(fullscreen . fullheight))
+(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+(add-to-list 'default-frame-alist '(fullscreen . fullheight))
 #+END_SRC
 ** Escape to quit prompt
 Press ~ESC~ to quit the prompt
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+END_SRC
 ** No menu bar, tool bar, and scroll bar
 Removing tool bar on top. Let's be honest, who uses it. ...
@@ -333,15 +222,6 @@ Removing tool bar on top. Let's be honest, who uses it. ...
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
-#+END_SRC
-** CUA mode ( for copy paste )
-Usual C-c C-v for copy paste
-#+BEGIN_SRC emacs-lisp :tangle no
-;;; Auto CUA mode
-(cua-mode t)
-(setq cua-auto-tabify-rectangles nil) ;; Don't tabify after rectangle commands
-(transient-mark-mode 1) ;; No region when it is not highlighted
-(setq cua-keep-region-after-copy t) ;; Standard Windows behaviour
 #+END_SRC
 ** Auto line number
 To always have line numbers on the side
@@ -363,9 +243,18 @@ Showing relative line numbers
 #+BEGIN_SRC emacs-lisp :tangle no
 (setq display-line-numbers-type 'relative)
 #+END_SRC
+** Intentation guide
+Need to add the delay else movind around becomes very slow
+#+begin_src emacs-lisp
+(use-package indent-guide
+  :config
+  (setq indent-guide-char "┃")
+  (set-face-foreground 'indent-guide-face "dimgray")
+  (setq indent-guide-delay 0.4)
+  (indent-guide-global-mode))
+#+end_src
 ** Move custom files outside ~init.el~
-   Move all ~custom-*~ stuff into ~custom.config.el~. Do not put them in ~init.el~.
-
+Move all ~custom-*~ stuff into ~custom.config.el~. Do not put them in ~init.el~.
 #+begin_src emacs-lisp
 (setq custom-file "~/.emacs.d/custom.conf.el")
 (load-file custom-file)
@@ -406,10 +295,7 @@ Always remove trailing whitespaces
 #+begin_src emacs-lisp
 (use-package org
   :pin elpa
-  :bind (:map org-mode-map
-  ; Following is not needed. Pressing 's' does the same
-  ;( "C-c z" . org-toggle-narrow-to-subtree )
-))
+  :bind (:map org-mode-map))
 #+end_src
 
 ** Org Crypt
@@ -525,11 +411,11 @@ Only gather agenda entries from meetings and tasks.
 ** Org bable
 + Org bable load languages
  #+BEGIN_SRC emacs-lisp
-   (org-babel-do-load-languages
-    'org-babel-load-languages
-    '((python . t)
-      (shell . t)
-      (js . t)))
+(org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)
+     (shell . t)
+     (js . t)))
  #+END_SRC
 
 +  Org bable no confirmation for following languages
@@ -542,7 +428,8 @@ Only gather agenda entries from meetings and tasks.
 +  Language specific commands
   -  Python command
      #+BEGIN_SRC emacs-lisp
-     (setq org-babel-python-command "python3")
+     (setq org-babel-python-command "python")
+     ;(setq org-babel-python-evaluate-session #'org-babel-python-evaluate-session-by-file)
       #+END_SRC
 + Org html export, preserve indentation in src blocks
 #+BEGIN_SRC emacs-lisp
@@ -572,49 +459,48 @@ And log it to a drawer
 ** Elipsis
 The end of the heading character that will show that the heading is folded
 #+BEGIN_SRC emacs-lisp
-  (setq org-ellipsis " ⤵")
+(setq org-ellipsis " ⤵")
 #+END_SRC
 Other interesting characters are ▼ , ↴ , ⬎ , ⤷ , and ⋱
 ** Leading stars and indentation
 #+BEGIN_SRC emacs-lisp
-  (setq org-startup-indented t
-        org-hide-leading-stars t)
+(setq org-startup-indented t
+    org-hide-leading-stars t)
 #+END_SRC
 ** Hide emphasis markers
 Hide the ~code~, /italics/ and *bold* _underline_ =verbatim= ++strike-through++
 #+BEGIN_SRC emacs-lisp
-  (setq org-hide-emphasis-markers nil)
+(setq org-hide-emphasis-markers nil)
 #+END_SRC
 ** Pretty symbols
 Show pretty symbols like \lambda instead of \ lambda
 #+BEGIN_SRC emacs-lisp
-  (setq org-pretty-entities t)
+(setq org-pretty-entities t)
 #+END_SRC
 ** TODO Custom faces for different headline level
 These are having some issues with toto font size being too small so check it out
 #+BEGIN_SRC emacs-lisp :tangle no
-  (custom-theme-set-faces
-       'user
-      `(org-level-4 ((t ( :height 1.1   ))))
-     `(org-level-3 ((t ( :height 1  ))))
-    `(org-level-2 ((t ( :height 1.1   ))))
-   `(org-level-1 ((t ( :height 1.25  ))))
-   `(org-document-title ((t ( :height 1.5 :underline nil)))))
+(custom-theme-set-faces
+    'user
+    `(org-level-4 ((t ( :height 1.10))))
+    `(org-level-3 ((t ( :height 1.00))))
+    `(org-level-2 ((t ( :height 1.10))))
+    `(org-level-1 ((t ( :height 1.25))))
+    `(org-document-title ((t ( :height 1.5 :underline nil)))))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-  (dolist (face '((org-level-1 . 1.3)
-                  (org-level-2 . 1.1)
-                  (org-level-3 . 1.05)
-                  (org-level-4 . 1.0)
-                  (org-level-5 . 1.1)
-                  (org-level-6 . 1.1)
-                  (org-level-7 . 1.1)
-                  (org-level-8 . 1.1)))
-      (set-face-attribute (car face) nil :weight 'regular :height (cdr face)))
-
+(dolist (face '((org-level-1 . 1.3)
+                (org-level-2 . 1.1)
+                (org-level-3 . 1.05)
+                (org-level-4 . 1.0)
+                (org-level-5 . 1.1)
+                (org-level-6 . 1.1)
+                (org-level-7 . 1.1)
+                (org-level-8 . 1.1)))
+  (set-face-attribute (car face) nil :weight 'regular :height (cdr face)))
 #+END_SRC
-** Variable pitch mode ? Ye kya hai re bava?
+** TODO Variable pitch mode ? Ye kya hai re bava?
 #+BEGIN_SRC emacs-lisp
   ;(add-hook 'org-mode-hook 'variable-pitch-mode)
 #+END_SRC
@@ -637,7 +523,7 @@ These are having some issues with toto font size being too small so check it out
 ** Src edit window no split
 Do not split while editing ~src~ with ~C-c '~
 #+BEGIN_SRC emacs-lisp :tangle no
-  (setq org-src-window-setup 'current-window)
+(setq org-src-window-setup 'current-window)
 #+END_SRC
 ** Task Workflow
 Each task that is to be done is assigned =TODO=
@@ -737,13 +623,23 @@ Sort tags alphabetically
 #+begin_src emacs-lisp
 (setq org-tags-sort-function 'string-collate-lessp)
 #+end_src
+
+** Eshell Autosuggest
+#+begin_src emacs-lisp
+(use-package esh-autosuggest
+  :hook (eshell-mode . esh-autosuggest-mode)
+  ;; If you have use-package-hook-name-suffix set to nil, uncomment and use the
+  ;; line below instead:
+  :hook (eshell-mode-hook . esh-autosuggest-mode)
+  :ensure t)
+#+end_src
 * RSS Feed reader
 ** Elfeed
 
 #+begin_src emacs-lisp
 (use-package elfeed
-:bind
-("C-x w" . elfeed))
+    :bind
+    ("C-x w" . elfeed))
 #+end_src
 
 * Org-roam
@@ -784,7 +680,7 @@ Seems nice. But this depends on Ido, so keep the Ido section
 ** Ibuffer
 To enter Ibuffer (gives a bit detailed view)
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-x C-b") 'ibuffer)
+(global-set-key (kbd "C-x C-b") 'ibuffer)
 #+END_SRC
 ** Smex
 For easy ~M-x~
@@ -809,22 +705,22 @@ To jump around buffer/windows
 ** Split window improvement
 This change willnot just split window but also follow to the new window.
 #+BEGIN_SRC emacs-lisp
-  (defun split-and-follow-horizontally ()
+  (defun split-window-below-and-follow ()
     (interactive)
     (split-window-below)
     (balance-windows)
     (other-window 1))
-  (global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
+  (global-set-key (kbd "C-x 2") 'split-window-below-and-follow)
 
-  (defun split-and-follow-vertically ()
+  (defun split-window-right-and-follow ()
     (interactive)
     (split-window-right)
     (balance-windows)
     (other-window 1))
-  (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
+  (global-set-key (kbd "C-x 3") 'split-window-right-and-follow)
 #+END_SRC
 ** Windmove
-Use Shift+Arrow keys to move to other windows
+Use C-M-<\uparrow \downarrow \leftarrow \rightarrow > to move to other windows
 #+begin_src emacs-lisp
 (use-package windmove
   :ensure nil
@@ -932,9 +828,9 @@ For inserting standard snippets and making
 #+END_SRC
 ** Magit
 #+BEGIN_SRC emacs-lisp
-  (use-package magit)
+(use-package magit)
 #+END_SRC
-** HTMLIZE
+** HTMLize
 #+BEGIN_SRC emacs-lisp
   (use-package htmlize)
  ; (use-package ox-publish)
@@ -1119,13 +1015,10 @@ This mode helps design IDE for different programming interfaces.
 
 * 💡 To do someday [0/7]
 ** TODO Autocomplete? Company?
-** TODO [[https://github.com/DarthFennec/highlight-indent-guides][Indentation highlight]]
 ** TODO Tab bar mode
 [[https://www.youtube.com/watch?v=C7ZlNRbWdVI][System Crafters video]]
 ** TODO [[https://github.com/noctuid/general.el][Geleral.el]] For managing keybindings
-** TODO  Using noweb to better organize config
-** TODO Projectile on project change activate venv and restart lsp
-** TODO Configure pyvenv
+** TODO Using noweb to better organize config
 ** TODO Desktop session save
 Check ~desktop save mode~
 * 🗃  Archives
@@ -1159,6 +1052,131 @@ The configuration wihich is not in use anymore
 
       (:config ((setq counsel-describe-function-function #'helpful-callable)
               (setq counsel-describe-variable-function #'helpful-variable)))
+#+END_SRC
+** Neo tree side buffer
+Using neotree to show current dir (Don't know how to use dired)
+First config command adds neotree to startup hook so that it loads on startup
+Second config command adds multiline mode to neotree so that long file names are shown by textwrap
+#+BEGIN_SRC emacs-lisp :tangle no
+(use-package neotree
+   :ensure t
+   :config
+   ; Load neotree on startup
+   ;(add-hook 'emacs-startup-hook 'neotree)
+   ; Visual line mode on neotree biffer
+   (add-hook 'neotree-mode-hook 'visual-line-mode)
+   :bind
+   ("C-a" . neotree-toggle))
+#+END_SRC
+Deprecated in favour of ~Treemacs~
+** VSCode dark theme
+ #+BEGIN_SRC emacs-lisp :tangle no
+ (use-package vscode-dark-plus-theme
+   :ensure t
+   :config
+   (load-theme 'vscode-dark-plus t))
+ #+END_SRC
+
+** Zenburn theme
+ #+BEGIN_SRC emacs-lisp :tangle no
+ (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+ (load-theme 'zenburn-theme t)
+ #+END_SRC
+** [[https://github.com/Alexander-Miller/treemacs][Treemacs]]
+
+#+begin_src emacs-lisp :tangle no
+(use-package treemacs
+  :ensure t
+  :defer t
+  :config
+  (progn
+    (setq treemacs-width                           25
+          treemacs-width-is-initially-locked       nil)
+
+    ;; The default width and height of the icons is 22 pixels. If you are
+    ;; using a Hi-DPI display, uncomment this to double the icon size.
+    ;;(treemacs-resize-icons 44)
+
+    (treemacs-follow-mode t)
+    (treemacs-indent-guide-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode 'always)
+    (when treemacs-python-executable
+      (treemacs-git-commit-diff-mode t))
+
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null treemacs-python-executable)))
+      (`(t . t)
+       (treemacs-git-mode 'deferred))
+      (`(t . _)
+       (treemacs-git-mode 'simple)))
+
+    (treemacs-hide-gitignored-files-mode nil))
+  :bind
+  (:map global-map
+        ("M-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("C-a"   . treemacs)
+        ("C-x t d"   . treemacs-select-directory)
+        ("C-x t B"   . treemacs-bookmark)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
+
+; Oher additions for treemacs
+(use-package treemacs-projectile
+  :after (treemacs projectile)
+  :ensure t)
+
+(use-package treemacs-icons-dired
+  :hook (dired-mode . treemacs-icons-dired-enable-once)
+  :ensure t)
+
+(use-package treemacs-magit
+  :after (treemacs magit)
+  :ensure t)
+
+(use-package treemacs-tab-bar ;;treemacs-tab-bar if you use tab-bar-mode
+  :after (treemacs)
+  :ensure t
+  :config (treemacs-set-scope-type 'Tabs))
+
+; Nerd icons for treemacs
+(use-package treemacs-nerd-icons
+  :config
+  (treemacs-load-theme "nerd-icons"))
+
+
+(defun aorst/treemacs-setup-title ()
+  (let ((bg (face-attribute 'default :background))
+        (fg (face-attribute 'default :foreground)))
+    (face-remap-add-relative 'header-line
+                             :background bg :foreground fg
+                             :box `(:line-width ,(/ (line-pixel-height) 2) :color ,bg)))
+  (setq header-line-format
+        '((:eval
+           (let* ((text (treemacs-workspace->name (treemacs-current-workspace)))
+                  (extra-align (+ (/ (length text) 2) 1))
+                  (width (- (/ (window-width) 2) extra-align)))
+             (concat (make-string width ?\s) text))))))
+
+(add-hook 'treemacs-mode-hook 'aorst/treemacs-setup-title)
+  #+end_src
+
+** Sudo edit
+Do I really need it?
+#+BEGIN_SRC emacs-lisp :tangle no
+  (use-package sudo-edit
+    :ensure t
+    :bind ("s-e" . sudo-edit))
+#+END_SRC
+** CUA mode ( for copy paste )
+Usual C-c C-v for copy paste
+#+BEGIN_SRC emacs-lisp :tangle no
+;;; Auto CUA mode
+(cua-mode t)
+(setq cua-auto-tabify-rectangles nil) ;; Don't tabify after rectangle commands
+(transient-mark-mode 1) ;; No region when it is not highlighted
+(setq cua-keep-region-after-copy t) ;; Standard Windows behaviour
 #+END_SRC
 * Desktop save mode
 #+begin_src emacs-lisp :tangle no
