@@ -28,7 +28,7 @@ Adding melpa package repository and initialize
 (require 'package)
 (setq package-archives '(("melpa-stable" . "https://stable.melpa.org/packages/")
                          ("elpa" . "https://elpa.gnu.org/packages/")
-                         ;("melpa" . "https://melpa.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")
 ))
 
 (package-initialize)
@@ -45,10 +45,10 @@ Note that you'll need to run ~M-x package-refresh-contents~ or ~M-x package-list
 ** Make sure that ~use-package~ is loaded
 This downloads ~use-package~ package if not installed.
 #+begin_src emacs-lisp
-  (unless (package-installed-p 'use-package)
-    (package-install 'use-package))
-  (require 'use-package)
-  (setq use-package-always-ensure t)
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+(require 'use-package)
+(setq use-package-always-ensure t)
 #+end_src
 
 * 🎨 Theme
@@ -64,11 +64,8 @@ This downloads ~use-package~ package if not installed.
 
     ;; Enable flashing mode-line on errors
     (doom-themes-visual-bell-config)
-    ;; Enable custom neotree theme (all-the-icons must be installed!)
-    ;(doom-themes-neotree-config)
-    ;; or for treemacs users
     (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-colors" for less minimal icon theme
-    ;(doom-themes-treemacs-config)
+
     ;; Corrects (and improves) org-mode's native fontification.
     (doom-themes-org-config))
 #+END_SRC
@@ -89,9 +86,9 @@ So we can use classic terminal view
 * 🍉 Terminal specific settings
 ** Enable Xterm-mouse-mode
 To be able to click-around with mouse
-   #+BEGIN_SRC emacs-lisp
-   (xterm-mouse-mode t)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+(xterm-mouse-mode t)
+#+END_SRC
 
 ** Smooth scrolling
 Scroll one line at a time, to make it feel like smooth.
@@ -197,15 +194,6 @@ Only for prog mode?
     :ensure t
     :bind ("M-y" . popup-kill-ring))
 #+END_SRC
-
-** Pretty characters mode
-This turns common programming keywords and symbol names to actual symbol. While this may be good in some situations, I do not want it enabled by default.
-#+BEGIN_SRC emacs-lisp :tangle no
-  (when window-system
-    (use-package pretty-mode
-      :ensure t
-      :config (global-pretty-mode 1)))
-#+END_SRC
 ** Open maximised
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
@@ -227,16 +215,16 @@ Removing tool bar on top. Let's be honest, who uses it. ...
 To always have line numbers on the side
 
 #+BEGIN_SRC emacs-lisp
-  (column-number-mode 1)
-  (line-number-mode 1)
-  (global-display-line-numbers-mode t)
+(column-number-mode 1)
+(line-number-mode 1)
+(global-display-line-numbers-mode t)
 
-  ;; Disable line numbers for some modes
-  (dolist (mode '(term-mode-hook
-                  eshell-mode-hook
-                  neotree-mode-hook
-		      treemacs-mode-hook))
-    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+;; Disable line numbers for some modes
+(dolist (mode '(term-mode-hook
+                eshell-mode-hook
+                neotree-mode-hook
+		treemacs-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+END_SRC
 
 Showing relative line numbers
@@ -275,8 +263,8 @@ Turn on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Visual-Line-
 Using nerd-icons in dired
 #+begin_src emacs-lisp
 (use-package nerd-icons-dired
-	:hook
-	(dired-mode . nerd-icons-dired-mode))
+:hook
+(dired-mode . nerd-icons-dired-mode))
 #+end_src
 ** Clipetty
 Copy stuff from emacs to windows clipboard
@@ -290,6 +278,45 @@ Always remove trailing whitespaces
 #+begin_src emacs-lisp
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+end_src
+** Keyfreq
+#+begin_src emacs-lisp
+(use-package keyfreq
+  :init
+  (keyfreq-mode 1)
+  (keyfreq-autosave-mode 1)
+  ; Exclude certain commands
+  (setq keyfreq-excluded-commands
+      '(self-insert-command
+        org-self-insert-command
+        hungry-delete-backward
+        hungry-delete-forward
+        mwheel-scroll
+        mouse-set-point
+        mouse-set-region
+        forward-char
+        backward-char
+        previous-line
+        next-line
+        right-char
+        left-char
+        ))
+  )
+#+end_src
+
+** Origami
+#+begin_src emacs-lisp
+(use-package origami)
+#+end_src
+** Eshell Autosuggest
+#+begin_src emacs-lisp
+(use-package esh-autosuggest
+  :hook (eshell-mode . esh-autosuggest-mode)
+  ;; If you have use-package-hook-name-suffix set to nil, uncomment and use the
+  ;; line below instead:
+  :hook (eshell-mode-hook . esh-autosuggest-mode)
+  :ensure t)
+#+end_src
+
 * 🦄 Org mode
 ** Pin Org mode
 #+begin_src emacs-lisp
@@ -353,20 +380,6 @@ Template for Tasks with a deadline.
   '"* TODO %?\nDEADLINE: %^{Deadline}t\n")
 #+end_src
 
-Template for House
-#+begin_src emacs-lisp
-(defun rambo/org-capture-template-house-koop ()
-  "Generate template string for house"
-  (concat "* TOVIEW %?\n"
-      ":PROPERTIES:\n"
-      ":COST: %?K\n"
-      ":AREA: %?m2\n"
-      ":ENERGYLABEL: %?\n"
-      ":BUURT: %?\n"
-      ":LINK: [[%?][funda]]\n"
-      ":END:"))
-#+end_src
-
 Create capture templates:
 #+begin_src emacs-lisp
 (setq org-capture-templates
@@ -385,9 +398,6 @@ Create capture templates:
         ("tn" "Task for now" entry
           (file+olp+datetree "~/notes/tasks.org" "Things to do Today")
           (function rambo/org-capture-template-todo-now) :prepend t :clock-in t :clock-keep nil :jump-to-captured t )
-       ("ha" "House hunting" entry
-          (file"~/notes/househunt.org")
-          (function rambo/org-capture-template-house-koop) :prepend t :jump-to-captured t)
 ))
 #+end_src
 
@@ -398,7 +408,10 @@ Only gather agenda entries from meetings and tasks.
 ; To solve the problem of tags being displayed out of window.
 (setq org-agenda-align-tags-to-column 150)
 #+end_src
-
+** Org archive
+#+begin_src emacs-lisp
+(setq org-archive-subtree-save-file-p t)
+#+end_src
 ** Open links in chrome when using in WSL
 
 #+begin_src emacs-lisp
@@ -452,9 +465,9 @@ And log it to a drawer
 
 ** Org Bullets
 #+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
-    :after org
-    :hook (org-mode . org-bullets-mode))
+(use-package org-bullets
+:after org
+:hook (org-mode . org-bullets-mode))
 #+END_SRC
 ** Elipsis
 The end of the heading character that will show that the heading is folded
@@ -477,33 +490,7 @@ Show pretty symbols like \lambda instead of \ lambda
 #+BEGIN_SRC emacs-lisp
 (setq org-pretty-entities t)
 #+END_SRC
-** TODO Custom faces for different headline level
-These are having some issues with toto font size being too small so check it out
-#+BEGIN_SRC emacs-lisp :tangle no
-(custom-theme-set-faces
-    'user
-    `(org-level-4 ((t ( :height 1.10))))
-    `(org-level-3 ((t ( :height 1.00))))
-    `(org-level-2 ((t ( :height 1.10))))
-    `(org-level-1 ((t ( :height 1.25))))
-    `(org-document-title ((t ( :height 1.5 :underline nil)))))
-#+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-(dolist (face '((org-level-1 . 1.3)
-                (org-level-2 . 1.1)
-                (org-level-3 . 1.05)
-                (org-level-4 . 1.0)
-                (org-level-5 . 1.1)
-                (org-level-6 . 1.1)
-                (org-level-7 . 1.1)
-                (org-level-8 . 1.1)))
-  (set-face-attribute (car face) nil :weight 'regular :height (cdr face)))
-#+END_SRC
-** TODO Variable pitch mode ? Ye kya hai re bava?
-#+BEGIN_SRC emacs-lisp
-  ;(add-hook 'org-mode-hook 'variable-pitch-mode)
-#+END_SRC
 ** Structured templates
 #+BEGIN_SRC emacs-lisp
 (require 'org-tempo)
@@ -515,16 +502,13 @@ These are having some issues with toto font size being too small so check it out
 (add-to-list 'org-structure-template-alist '("html" . "src html"))
 (add-to-list 'org-structure-template-alist '("json" . "src json"))
 (add-to-list 'org-structure-template-alist '("yml" . "src yaml"))
+(add-to-list 'org-structure-template-alist '("sql" . "src sql"))
 #+END_SRC
-
+** Org speed commands
 #+begin_src emacs-lisp
 (setq org-use-speed-commands t)
 #+end_src
-** Src edit window no split
-Do not split while editing ~src~ with ~C-c '~
-#+BEGIN_SRC emacs-lisp :tangle no
-(setq org-src-window-setup 'current-window)
-#+END_SRC
+
 ** Task Workflow
 Each task that is to be done is assigned =TODO=
 The task which is being worked on is assigned =TODO=
@@ -624,15 +608,33 @@ Sort tags alphabetically
 (setq org-tags-sort-function 'string-collate-lessp)
 #+end_src
 
-** Eshell Autosuggest
+Function to create tags overview
 #+begin_src emacs-lisp
-(use-package esh-autosuggest
-  :hook (eshell-mode . esh-autosuggest-mode)
-  ;; If you have use-package-hook-name-suffix set to nil, uncomment and use the
-  ;; line below instead:
-  :hook (eshell-mode-hook . esh-autosuggest-mode)
-  :ensure t)
+(defun count-tags ()
+  (let (tags count)
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward org-complex-heading-regexp nil t)
+        (dolist (tag (org-get-tags))
+          (push tag tags)))
+      (cl-loop with result
+               for tag in tags
+               do (push (list (cl-count tag tags
+                                        :test #'string=)
+                              tag)
+                        count)
+               collect
+               (setq result (cl-remove-duplicates count
+                                                  :test #'equal))
+               finally return
+               (cl-sort result #'> :key #'car)))))
 #+end_src
+
+Usage
+#+begin_src emacs-lisp :colnames '(freq tags)
+(count-tags)
+#+end_src
+
 * RSS Feed reader
 ** Elfeed
 
@@ -1014,6 +1016,107 @@ This mode helps design IDE for different programming interfaces.
 #+end_src
 
 * 💡 To do someday [0/7]
+** Hydra
+#+begin_src emacs-lisp
+(defhydra hydra-window (:color pink :hint nil :timeout 2)
+  "
+         Move                    Resize                      Swap              Split
+╭─────────────────────────────────────────────────────────────────────────────────────────┐
+         ^_<up>_^                    ^_C-<up>_^                      ^_M-<up>_^            [_v_]ertical
+          ^^▲^^                         ^^▲^^                           ^^▲^^              [_h_]orizontal
+ _<left>_ ◀   ▶ _<right>_    _C-<left>_ ◀   ▶ _C-<right>_    _M-<left>_ ◀   ▶ _M-<right>_
+          ^^▼^^                         ^^▼^^                           ^^▼^^              ╭──────────┐
+        ^_<down>_^                  ^_C-<down>_^                    ^_M-<down>_^           quit : [_SPC_]
+"
+  ("<left>" windmove-left)
+  ("<down>" windmove-down)
+  ("<up>" windmove-up)
+  ("<right>" windmove-right)
+  ("h" split-window-below)
+  ("v" split-window-right)
+  ("C-<up>" hydra-move-splitter-up)
+  ("C-<down>" hydra-move-splitter-down)
+  ("C-<left>" hydra-move-splitter-left)
+  ("C-<right>" hydra-move-splitter-right)
+  ("M-<up>" buf-move-up)
+  ("M-<down>" buf-move-down)
+  ("M-<left>" buf-move-left)
+  ("M-<right>" buf-move-right)
+  ("SPC" nil))
+
+
+                                        ;
+
+
+;; window movement / management
+(defhydra hydra-window (:hint nil)
+   "
+Movement      ^Split^            ^Switch^        ^Resize^
+----------------------------------------------------------------
+_j_ ←           _v_ertical         _b_uffer        _u_ ←
+_k_ ↓           _h_orizontal       _f_ind files    _i_ ↓
+_l_ ↑           _1_only this       _P_rojectile    _o_ ↑
+_;_ →           _d_elete           _s_wap          _p_ →
+_F_ollow        _e_qualize         _[_backward     _8_0 columns
+_q_uit          ^        ^         _]_forward
+"
+   ("j" windmove-left)
+   ("k" windmove-down)
+   ("l" windmove-up)
+   (";" windmove-right)
+   ("[" previous-buffer)
+   ("]" next-buffer)
+   ("u" hydra-move-splitter-left)
+   ("i" hydra-move-splitter-down)
+   ("o" hydra-move-splitter-up)
+   ("p" hydra-move-splitter-right)
+   ("b" ivy-switch-buffer)
+   ("f" counsel-find-file)
+   ("P" counsel-projectile-find-file)
+   ("F" follow-mode)
+   ("s" switch-window-then-swap-buffer)
+   ("8" set-80-columns)
+   ("v" split-window-right)
+   ("h" split-window-below)
+   ("3" split-window-right)
+   ("2" split-window-below)
+   ("d" delete-window)
+   ("1" delete-other-windows)
+   ("e" balance-windows)
+   ("q" nil))
+
+(defun hydra-move-splitter-left (arg)
+  "Move window splitter left."
+  (interactive "p")
+  (if (let ((windmove-wrap-around))
+        (windmove-find-other-window 'right))
+      (shrink-window-horizontally arg)
+    (enlarge-window-horizontally arg)))
+
+(defun hydra-move-splitter-right (arg)
+  "Move window splitter right."
+  (interactive "p")
+  (if (let ((windmove-wrap-around))
+        (windmove-find-other-window 'right))
+      (enlarge-window-horizontally arg)
+    (shrink-window-horizontally arg)))
+
+(defun hydra-move-splitter-up (arg)
+  "Move window splitter up."
+  (interactive "p")
+  (if (let ((windmove-wrap-around))
+        (windmove-find-other-window 'up))
+      (enlarge-window arg)
+    (shrink-window arg)))
+
+(defun hydra-move-splitter-down (arg)
+  "Move window splitter down."
+  (interactive "p")
+  (if (let ((windmove-wrap-around))
+        (windmove-find-other-window 'up))
+      (shrink-window arg)
+    (enlarge-window arg)))
+#+end_src
 ** TODO Autocomplete? Company?
 ** TODO Tab bar mode
 [[https://www.youtube.com/watch?v=C7ZlNRbWdVI][System Crafters video]]
@@ -1177,6 +1280,42 @@ Usual C-c C-v for copy paste
 (setq cua-auto-tabify-rectangles nil) ;; Don't tabify after rectangle commands
 (transient-mark-mode 1) ;; No region when it is not highlighted
 (setq cua-keep-region-after-copy t) ;; Standard Windows behaviour
+#+END_SRC
+** Pretty characters mode
+This turns common programming keywords and symbol names to actual symbol. While this may be good in some situations, I do not want it enabled by default.
+#+BEGIN_SRC emacs-lisp :tangle no
+  (when window-system
+    (use-package pretty-mode
+      :ensure t
+      :config (global-pretty-mode 1)))
+#+END_SRC
+** Org mode Custom faces for different headline level
+These are having some issues with toto font size being too small so check it out
+#+BEGIN_SRC emacs-lisp :tangle no
+(custom-theme-set-faces
+    'user
+    `(org-level-4 ((t ( :height 1.10))))
+    `(org-level-3 ((t ( :height 1.00))))
+    `(org-level-2 ((t ( :height 1.10))))
+    `(org-level-1 ((t ( :height 1.25))))
+    `(org-document-title ((t ( :height 1.5 :underline nil)))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(dolist (face '((org-level-1 . 1.3)
+                (org-level-2 . 1.1)
+                (org-level-3 . 1.05)
+                (org-level-4 . 1.0)
+                (org-level-5 . 1.1)
+                (org-level-6 . 1.1)
+                (org-level-7 . 1.1)
+                (org-level-8 . 1.1)))
+  (set-face-attribute (car face) nil :weight 'regular :height (cdr face)))
+#+END_SRC
+** Org Src edit window no split
+Do not split while editing ~src~ with ~C-c '~
+#+BEGIN_SRC emacs-lisp :tangle no
+(setq org-src-window-setup 'current-window)
 #+END_SRC
 * Desktop save mode
 #+begin_src emacs-lisp :tangle no
