@@ -29,7 +29,7 @@ Adding melpa package repository and initialize
 (setq package-archives '(("melpa-stable" . "https://stable.melpa.org/packages/")
                          ("elpa" . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")
-))
+                         ))
 
 (package-initialize)
 #+end_src
@@ -609,7 +609,7 @@ Sort tags alphabetically
 #+end_src
 
 Function to create tags overview
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (defun count-tags ()
   (let (tags count)
     (save-excursion
@@ -631,7 +631,7 @@ Function to create tags overview
 #+end_src
 
 Usage
-#+begin_src emacs-lisp :colnames '(freq tags)
+#+begin_src emacs-lisp :colnames '(freq tags) :tangle no
 (count-tags)
 #+end_src
 
@@ -645,16 +645,30 @@ Usage
 #+end_src
 
 * Org-roam
-#+begin_src emacs-lisp :tangle no
+
+** Setup
+#+begin_src emacs-lisp
 (use-package org-roam
   :ensure t
-  :require org
+  :custom
   (org-roam-directory "~/notes/roam")
+  (org-roam-db-location "/home/shriram/.emacs.d/org-roam.db")
   :bind (("C-c n l" . org-roam-buffer-toggle)
-          ("C-c n f" . org-roam-node-find)
-	    ("C-c n i" . org-roam-node-insert))
-  :config (org-roam-setup))
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n i" . org-roam-node-insert))
+  :config
+  (org-roam-setup))
 #+end_src
+** Capture Templates
+
+Template for bitbucket repository
+#+begin_src emacs-lisp
+(defun rambo/org-captyre-template-git-repo ()
+  "Generate template for git repository"
+  '"* bibu:%?\n"
+  )
+#+end_src
+
 * 🚶🏽 Moving around
 ** TODO Jump n lines up and down and use relative linum
 ** Ido
@@ -1017,7 +1031,7 @@ This mode helps design IDE for different programming interfaces.
 
 * 💡 To do someday [0/7]
 ** Hydra
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (defhydra hydra-window (:color pink :hint nil :timeout 2)
   "
          Move                    Resize                      Swap              Split
